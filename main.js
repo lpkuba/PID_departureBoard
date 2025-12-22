@@ -1,7 +1,60 @@
 let stops = {};
-let stopsMap, stopsMappedArray;
-const fetchOpt = require("options.json");
+let stopsMap, stopsMappedArray, fuseStops,  fetchOpt, fuse;
 async function init(){
+    let response = await fetch("options.json");
+    fetchOpt = await response.json();
+
+    response = await fetch("./src/stops.json");
+    stops = await response.json();
+
+    console.log(stops);
+    fuse = new Fuse(stops.stopGroups,{
+        keys: [{name:'uniqueName', weight: 3}, {name:'stops.altIdosName', weight: 1}],
+        threshold: 0.3,
+        limit: 10
+    });
+
+}
+
+function searchChanged(){
+    console.log("search changed");
+    let searchInput = document.getElementById("stopInput").value;
+    if(searchInput != ""){
+        document.getElementById("searchDropdown").hidden = false;
+    }
+    else{
+        document.getElementById("searchDropdown").hidden = true;
+    }
+    let searchResult = fuse.search(searchInput).slice(0,10);
+    console.log(searchResult);
+    updateSearchList(searchResult);
+}
+
+function updateSearchList(list){
+    document.getElementById("searchDropdown").textContent = "";
+
+    for (let i = 0; i < list.length; i++) {
+        const element = list[i].item;
+        let newStopElement = document.createElement("div");
+        newStopElement.classList.add("stops");
+        newStopElement.onclick = function() {updateSearchValue(element.uniqueName)};
+        let stopName = document.createElement("span");
+        stopName.innerHTML = element.uniqueName;
+        let stopLines = document.createElement("span");
+        stopLines.classList.add("lines");
+        stopLines.innerHTML = "placeholder";
+        newStopElement.appendChild(stopName);
+        newStopElement.appendChild(document.createElement("br"));
+        newStopElement.appendChild(stopLines);
+        document.getElementById("searchDropdown").appendChild(newStopElement);
+    }
+}
+
+function updateSearchValue(value){
+    document.getElementById("stopInput").value = value;
+    searchChanged();
+}
+/*async function init(){
     console.log("Probíhá inicializace...");
     const response = await fetch("https://api.golemio.cz/v2/gtfs/stops", fetchOpt);
     stops = await response.text();
@@ -48,7 +101,8 @@ async function searchStop(){
         console.log("Nenalezena zastávka!");
         document.getElementById("stopResult").innerHTML = "Nenalezena zastávka!";
     }
-}
+}*/
+
 async function fetchDepartures(stopId){
     const response = await fetch(`https://api.golemio.cz/v2/pid/departureboards?ids=${stopId}&filter=routeOnce`, fetchOpt);
     console.log(await response.text());

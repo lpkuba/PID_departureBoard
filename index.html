@@ -4,12 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odjezdová Tabule</title>
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
+    <script src="./main.js"></script>
+    <link rel="stylesheet" href="./main.css">
     
 </head>
-<body onLoad="init()">
-    <label for="stopInput">Zadej jméno hledané zastávky:</label><input type="text" id="stopInput"><br>
+<body onload="init()">
+    <label for="stopInput">Zadej jméno hledané zastávky:</label>
+    <div class="dropdown">
+        <input type="text" id="stopInput" placeholder="název zastávky..." oninput="searchChanged()" style="display: block">
+        <div class="dropdown-content" id="searchDropdown">
+            <div class="stops">
+                <span>Zastávka 1</span><br>
+                <span class="lines">placeholder</span>
+            </div>
+            <div class="stops">
+                <span>Zastávka 2</span><br>
+                <span class="lines">bus: 303, 344, 343, 408</span>
+            </div>
+            <div class="stops">
+                <span>Zastávka 3</span><br>
+                <span class="lines">bus: 303, 344, 343, 408</span>
+            </div>
+        </div>
+    </div><br>
     <button onclick="searchStop()">Vyhledej!</button><br>
     <span id="stopResult"></span>
 </body>

@@ -1,0 +1,33 @@
+body{
+    background-color: lightskyblue;
+}
+.dropdown{
+   width: 200px;
+   display: block;
+}
+.dropdown input{
+    max-width: 200px;
+}
+.dropdown-content{
+    background-color: lightblue;
+    margin-top: 5px;
+    
+}
+.dropdown-content .stops{
+    text-align: left;
+    padding: 5px 0 10px 5px;
+    border: 1px solid gray;
+    margin: 0;
+    border-collapse: collapse;
+    font-family: Bahnschrift;
+    font-weight: bold;
+    cursor: pointer;
+}
+.dropdown-content .stops:hover{
+    background-color: lightcoral;
+}
+
+.dropdown-content .stops .lines{
+    font-size: 10px;
+    font-weight: lighter;
+}
