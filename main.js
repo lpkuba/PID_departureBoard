@@ -34,6 +34,7 @@ function updateSearchList(list){
     document.getElementById("searchDropdown").textContent = "";
 
     for (let i = 0; i < list.length; i++) {
+        let linky = [];
         const element = list[i].item;
         let newStopElement = document.createElement("div");
         newStopElement.classList.add("stops");
@@ -42,7 +43,17 @@ function updateSearchList(list){
         stopName.innerHTML = element.uniqueName;
         let stopLines = document.createElement("span");
         stopLines.classList.add("lines");
-        stopLines.innerHTML = "placeholder";
+        //nested foreache <3
+        element.stops.forEach(nastupiste => {
+            nastupiste.lines.forEach(linka => {
+                if(!linky.includes(linka.name)){
+                    linky.push(linka.name);
+                }
+            });
+        });
+        linky.forEach(text => {
+            stopLines.innerHTML += `${text} `;
+        })
         newStopElement.appendChild(stopName);
         newStopElement.appendChild(document.createElement("br"));
         newStopElement.appendChild(stopLines);
