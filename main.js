@@ -1,5 +1,5 @@
 let stops = {};
-let stopsMap, stopsMappedArray, fuseStops,  fetchOpt, fuse;
+let stopsMap, stopsMappedArray, fuseStops,  fetchOpt, fuse, selectedStop;
 async function init(){
     let response = await fetch("options.json");
     fetchOpt = await response.json();
@@ -32,7 +32,8 @@ function searchChanged(){
 
 function updateSearchList(list){
     document.getElementById("searchDropdown").textContent = "";
-
+    selectedStop = list[0].item;
+    document.getElementById("stopResult").innerHTML = selectedStop.cis;
     for (let i = 0; i < list.length; i++) {
         let linky = [];
         const element = list[i].item;
@@ -64,6 +65,12 @@ function updateSearchList(list){
 function updateSearchValue(value){
     document.getElementById("stopInput").value = value;
     searchChanged();
+}
+
+async function getDepartures(){
+    let response = await fetch(`https://api.golemio.cz/v2/pid/departureboards?cisIds=${selectedStop.cis}`, fetchOpt);
+    const departures = await response.json();
+    console.log(departures);
 }
 /*async function init(){
     console.log("Probíhá inicializace...");
