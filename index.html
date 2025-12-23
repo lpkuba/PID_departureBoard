@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Odjezdová Tabule</title>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zumer/snapdom/dist/snapdom.min.js"></script>
     <script src="./main.js"></script>
     <link rel="stylesheet" href="./main.css">
     <link rel="stylesheet" href="./routeColors.css">
@@ -34,74 +35,37 @@
                 </div>-->
             </div>
         </div><br>
-        <button onclick="getDepartures()">Vyhledej!</button><br>
+        <button onclick="getDepartures()">Vyhledej!</button><button onclick="saveAsPNG()">Vygeneruj PNG</button><br>
         <span id="stopResult"></span>
     </div>
     <div class="departureBoard" id="departureBoard">
-        <div class="header">
+        <!--<div class="header">
             <span class="stopName">Název Zastávky</span>
             <span class="clock">12:34</span>
         </div>
-                <div class="departure">
-                    <div class="lineInfo">
-                        <span class="line bus">100</span>
-                        <img height="30px" src="./src/icons/arrow.svg">
-                        <span class="heading">Zličín</span>
-                        <img height="50px" src="./src/icons/metroB.svg">
-                    </div>
-                    <div class="lineDepartures">
-                        <span class="departureTime">12:40</span>
-                        <span class="delayTime">+1'10"</span>
-                    </div>
-                </div>
-                <div class="departure">
-                    <div class="lineInfo">
-                        <span class="line bus">100</span>
-                        <img height="30px" src="./src/icons/arrow.svg">
-                        <span class="heading">Zličín</span>
-                        <img height="50px" src="./src/icons/metroB.svg">
-                    </div>
-                    <div class="lineDepartures">
-                        <span class="departureTime">12:42</span>
-                        <span class="delayTime">+1'10"</span>
-                    </div>
-                </div>
-                <div class="departure">
-                    <div class="lineInfo">
-                        <span class="line bus">100</span>
-                        <img height="30px" src="./src/icons/arrow.svg">
-                        <span class="heading">Zličín</span>
-                        <img height="50px" src="./src/icons/metroB.svg">
-                    </div>
-                    <div class="lineDepartures">
-                        <span class="departureTime">12:42</span>
-                        <span class="delayTime">+1'10"</span>
-                    </div>
-                </div>
-                <div class="departure">
-                    <div class="lineInfo">
-                        <span class="line"><img height="64px" src="./src/icons/metroB.svg"></span>
-                        <img height="30px" src="./src/icons/arrow.svg">
-                        <span class="heading">Zličín</span>
-                        <img height="50px" src="./src/icons/metroB.svg">
-                    </div>
-                    <div class="lineDepartures">
-                        <span class="departureTime">12:42</span>
-                        <span class="delayTime">+1'10"</span>
-                    </div>
-                </div>
-                <div class="departure">
-                    <div class="lineInfo">
-                        <span class="line bus">100</span>
-                        <img height="30px" src="./src/icons/arrow.svg">
-                        <span class="heading">Zličín</span>
-                        <img height="50px" src="./src/icons/metroB.svg">
-                    </div>
-                    <div class="lineDepartures">
-                        <span class="departureTime">12:42</span>
-                        <span class="delayTime">+1'10"</span>
-                    </div>
-                </div>
+        <div class="departure">
+            <div class="lineInfo">
+                <span class="line bus">100</span>
+                <img height="30px" src="./src/icons/arrow.svg">
+                <span class="heading" style="font-size: 40px;">Mnichovo Hradiště,dopravní terminál, rozcestí kozodírky</span>
+            </div>
+            <div class="lineDepartures">
+                <span class="departureTime">12:42</span>
+                <span class="delayTime">+1'10"</span>
+            </div>
+        </div>
+        <div class="departure">
+            <div class="lineInfo">
+                <span class="line bus">100</span>
+                <img height="30px" src="./src/icons/arrow.svg">
+                <span class="heading">Zličín</span>
+                <img height="50px" src="./src/icons/metroB.svg">
+            </div>
+            <div class="lineDepartures">
+                <span class="departureTime">12:40</span>
+                <span class="delayTime">+1'10"</span>
+            </div>
+        </div>-->
     </div>
 </body>
 </html>

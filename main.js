@@ -16,6 +16,15 @@ async function init(){
 
 }
 
+function saveAsPNG() {
+  snapdom.download(document.getElementById("departureBoard"), {
+    format: 'png',
+    filename: 'odjezdy',
+  }).catch(function(err) {
+    console.error('Save failed:', err);
+  });
+}
+
 function searchChanged(){
     console.log("search changed");
     let searchInput = document.getElementById("stopInput").value;
@@ -71,7 +80,7 @@ async function getDepartures(){
     const date = new Date();
     let hh = String(date.getHours()).padStart(2, "0");
     let mm = String(date.getMinutes()).padStart(2, "0");
-    document.getElementById("departureBoard").innerHTML = 
+    let toAdd = 
     `   <div class="header">
             <span class="stopName">${selectedStop.uniqueName}</span>
             <span class="clock">${hh}:${mm}</span>
@@ -81,7 +90,7 @@ async function getDepartures(){
     let temp = await response.json();
     const departures = temp.departures;
     departures.forEach(dep => {
-        let date = new Date(dep.arrival_timestamp.scheduled);
+        let date = new Date(dep.departure_timestamp.scheduled);
         let h = String(date.getHours()).padStart(2, "0");
         let m = String(date.getMinutes()).padStart(2, "0");
         let linka = dep.route.short_name;
@@ -122,11 +131,12 @@ async function getDepartures(){
                 typ += "funicular";
             break;
             case 11:
-                typ += "trolleybus";
+                typ += "tbus";
             break;
         }
-        
-        document.getElementById("departureBoard").innerHTML += `
+        console.log(`${h}:${m}`);
+        console.log("LINKA: " + linka);
+        toAdd += `
                 <div class="departure">
                     <div class="lineInfo">
                         <span class="line ${typ}">${linka}</span>
@@ -140,11 +150,12 @@ async function getDepartures(){
                 </div>
         `;
     });
+    document.getElementById("departureBoard").innerHTML = toAdd;
     console.log(departures);
-
 }
 
 async function fetchDepartures(stopId){
     const response = await fetch(`https://api.golemio.cz/v2/pid/departureboards?ids=${stopId}&filter=routeOnce`, fetchOpt);
     console.log(await response.text());
 }
+
