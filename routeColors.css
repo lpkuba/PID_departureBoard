@@ -1,0 +1,56 @@
+.tbus{
+    color: rgb(128 22 111);
+    background-color: white;
+}
+.bus{
+    color: rgb(0 120 160);
+    background-color: white;
+
+}
+.schoolBus{
+    color: rgb(0 120 160);
+    background-color: white;
+
+}
+.regbus{
+    color: rgb(25 25 25);
+    background-color: white;
+
+}
+.nightbus{
+    background-color: rgb(0 120 160);
+    color: white;
+}
+.nightregbus{
+    background-color: rgb(9 0 62);
+    color: white;
+}
+.specialBus{
+    color: rgb(143 188 25);
+    background-color: white;
+
+}
+.replacement{
+    color: rgb(255 170 30);
+    background-color: white;
+
+}
+.otherBus{
+    color: rgb(150 150 150);
+    background-color: white;
+
+}
+.tram{
+    color: rgb(120 2 0);
+    background-color: white;
+}
+
+.tram{
+    color: rgb(120 2 0);
+    background-color: white;
+}
+
+.nighttram{
+    color: white;
+    background-color: rgb(120 2 0);
+}

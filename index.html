@@ -7,28 +7,101 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
     <script src="./main.js"></script>
     <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="./routeColors.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
     
 </head>
 <body onload="init()">
-    <label for="stopInput">Zadej jméno hledané zastávky:</label>
-    <div class="dropdown">
-        <input type="text" id="stopInput" placeholder="název zastávky..." oninput="searchChanged()" style="display: block">
-        <div class="dropdown-content" id="searchDropdown">
-            <div class="stops">
-                <span>Zastávka 1</span><br>
-                <span class="lines">placeholder</span>
+    <div class="setup">
+        <label for="stopInput">Zadej jméno hledané zastávky:</label>
+        <div class="dropdown">
+            <input type="text" id="stopInput" placeholder="název zastávky..." oninput="searchChanged()" style="display: block">
+            <div class="dropdown-content" id="searchDropdown" hidden>
+                <!--<div class="stops">
+                    <span>Zastávka 1</span><br>
+                    <span class="lines">placeholder</span>
+                </div>
+                <div class="stops">
+                    <span>Zastávka 2</span><br>
+                    <span class="lines">bus: 303, 344, 343, 408</span>
+                </div>
+                <div class="stops">
+                    <span>Zastávka 3</span><br>
+                    <span class="lines">bus: 303, 344, 343, 408</span>
+                </div>-->
             </div>
-            <div class="stops">
-                <span>Zastávka 2</span><br>
-                <span class="lines">bus: 303, 344, 343, 408</span>
-            </div>
-            <div class="stops">
-                <span>Zastávka 3</span><br>
-                <span class="lines">bus: 303, 344, 343, 408</span>
-            </div>
+        </div><br>
+        <button onclick="getDepartures()">Vyhledej!</button><br>
+        <span id="stopResult"></span>
+    </div>
+    <div class="departureBoard" id="departureBoard">
+        <div class="header">
+            <span class="stopName">Název Zastávky</span>
+            <span class="clock">12:34</span>
         </div>
-    </div><br>
-    <button onclick="getDepartures()">Vyhledej!</button><br>
-    <span id="stopResult"></span>
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line bus">100</span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">Zličín</span>
+                        <img height="50px" src="./src/icons/metroB.svg">
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">12:40</span>
+                        <span class="delayTime">+1'10"</span>
+                    </div>
+                </div>
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line bus">100</span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">Zličín</span>
+                        <img height="50px" src="./src/icons/metroB.svg">
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">12:42</span>
+                        <span class="delayTime">+1'10"</span>
+                    </div>
+                </div>
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line bus">100</span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">Zličín</span>
+                        <img height="50px" src="./src/icons/metroB.svg">
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">12:42</span>
+                        <span class="delayTime">+1'10"</span>
+                    </div>
+                </div>
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line"><img height="64px" src="./src/icons/metroB.svg"></span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">Zličín</span>
+                        <img height="50px" src="./src/icons/metroB.svg">
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">12:42</span>
+                        <span class="delayTime">+1'10"</span>
+                    </div>
+                </div>
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line bus">100</span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">Zličín</span>
+                        <img height="50px" src="./src/icons/metroB.svg">
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">12:42</span>
+                        <span class="delayTime">+1'10"</span>
+                    </div>
+                </div>
+    </div>
 </body>
 </html>

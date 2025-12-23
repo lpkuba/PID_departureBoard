@@ -68,58 +68,81 @@ function updateSearchValue(value){
 }
 
 async function getDepartures(){
+    const date = new Date();
+    let hh = String(date.getHours()).padStart(2, "0");
+    let mm = String(date.getMinutes()).padStart(2, "0");
+    document.getElementById("departureBoard").innerHTML = 
+    `   <div class="header">
+            <span class="stopName">${selectedStop.uniqueName}</span>
+            <span class="clock">${hh}:${mm}</span>
+        </div>
+        `;
     let response = await fetch(`https://api.golemio.cz/v2/pid/departureboards?cisIds=${selectedStop.cis}`, fetchOpt);
-    const departures = await response.json();
-    console.log(departures);
-}
-/*async function init(){
-    console.log("Probíhá inicializace...");
-    const response = await fetch("https://api.golemio.cz/v2/gtfs/stops", fetchOpt);
-    stops = await response.text();
-    stops = JSON.parse(stops);
-    console.log(stops);
-    stopsMap = new Map();
-    stops.features.forEach((stop, index) => {
-        //console.log(stop);
-        if(stop.properties.zone_id != null){
-            let nigga = stop.properties.stop_name
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "") 
-                .replace(/[.,]/g, "")
-                .toLowerCase();
-            stopsMap.set(nigga, index);  
-            //console.log(`Zakládám entry pro zastávku s norm. jm.: ${nigga} s ID: ${stop.properties.stop_id}`);
+    let temp = await response.json();
+    const departures = temp.departures;
+    departures.forEach(dep => {
+        let date = new Date(dep.arrival_timestamp.scheduled);
+        let h = String(date.getHours()).padStart(2, "0");
+        let m = String(date.getMinutes()).padStart(2, "0");
+        let linka = dep.route.short_name;
+        let smer = dep.trip.headsign;
+        let zpozdeni = dep.delay.minutes;
+        let zpozdeniText;
+        if(zpozdeni < 0){
+            zpozdeniText = `${zpozdeni}"`;
         }
+        else{
+            zpozdeniText = `+${zpozdeni}"`;
+        }
+        let typ = "";
+        if(dep.route.is_night){
+            typ += "night";
+        }
+        if(dep.route.is_regional){
+            typ += "reg";
+        }
+        switch (dep.route.type) {
+            case 0:
+                typ += "tram";
+            break;
+            case 1:
+                typ = "";
+                linka = `<img height="64px" src="./src/icons/metro${linka}.svg">`;
+            break;
+            case 2:
+                typ += "train";
+            break;
+            case 3:
+                typ += "bus";
+            break;
+            case 4:
+                typ += "ferry";
+            break;
+            case 7:
+                typ += "funicular";
+            break;
+            case 11:
+                typ += "trolleybus";
+            break;
+        }
+        
+        document.getElementById("departureBoard").innerHTML += `
+                <div class="departure">
+                    <div class="lineInfo">
+                        <span class="line ${typ}">${linka}</span>
+                        <img height="30px" src="./src/icons/arrow.svg">
+                        <span class="heading">${smer}</span>
+                    </div>
+                    <div class="lineDepartures">
+                        <span class="departureTime">${h}:${m}</span>
+                        <span class="delayTime"></span>
+                    </div>
+                </div>
+        `;
     });
-    console.log("Zkompletována mapa zastávek!");
-    stopsMappedArray = [...stopsMap].map(([name, id]) => ({ name, id }));
+    console.log(departures);
+
 }
-async function searchStop(){
-    let input = document.getElementById("stopInput").value
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "") 
-        .replace(/[.,]/g, "")
-        .toLowerCase();
-    const fuse = new Fuse(stopsMappedArray, {
-      keys: ["name"],
-      threshold: 0.3
-    });
-    //console.log(stopsMappedArray);
-    const result = await fuse.search(input);
-    if(result.length > 0){
-        const index = result[0].item.id;
-        let stop = stops.features[result[0].item.id].properties;
-        console.log(stop.stop_name);
-        document.getElementById("stopResult").innerHTML = stop.stop_name;
-        document.getElementById("stopResult").innerHTML += "<br>";
-        document.getElementById("stopResult").innerHTML += stop.stop_id;
-        fetchDepartures(stop.stop_id);
-    }
-    else{
-        console.log("Nenalezena zastávka!");
-        document.getElementById("stopResult").innerHTML = "Nenalezena zastávka!";
-    }
-}*/
 
 async function fetchDepartures(stopId){
     const response = await fetch(`https://api.golemio.cz/v2/pid/departureboards?ids=${stopId}&filter=routeOnce`, fetchOpt);

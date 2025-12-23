@@ -31,3 +31,203 @@ body{
     font-size: 10px;
     font-weight: lighter;
 }
+
+.departureBoard{
+    background-color: rgb(0, 11, 59);
+    color: white;
+    font-family: Roboto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 50px 20px 50px;
+    width: 1000px;
+}
+
+.departureBoard .header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 5px lightgray solid;
+}
+.departureBoard .stopName{
+    font-size: 64px;
+    font-family: Roboto;
+    font-weight: bold;
+}
+
+.departureBoard .clock{
+    margin: 10px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: bold;
+    float: right;
+    color: rgb(255, 255, 255);
+    font-size: 84px;
+    border-radius: 10px;
+}
+
+.departureBoard .line{
+    font-size: 50px;
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 5px;
+    width: 100px;
+    text-align: center;
+}
+
+.departureBoard .departure{
+    display: flex;
+    
+    padding-top: 20px;
+    width: 100%;
+    margin: 0;
+    justify-content: space-between;
+}
+
+.departureBoard .lineInfo{
+    display: flex;
+    align-items: center;
+    font-size: 50px;
+    font-weight: bold;
+    gap: 10px;
+
+}
+
+.departureBoard .lineDepartures{
+    display: flex;
+    align-items: center;
+    font-size: 50px;
+    text-transform: uppercase;
+    font-weight: bold;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.departureBoard .delayTime{
+    color: lightcoral;
+    font-size: 36px;
+    vertical-align: top;
+}
+ol {
+    list-style-type: none;
+}
+
+.departures {
+    top: 0px;
+    left: 0px;
+    width: 1680px;
+    height: 1050px;
+    background-color: white;
+    position: absolute;
+    float: left;
+    z-index: 2;
+    font-size: 0;
+}
+
+.departures .line{
+    width: 400px;
+    line-height: 200px;
+    font-family: Roboto;
+    font-weight: bold;
+    font-size: 200px;
+    background-color: white;
+    text-align: center;
+    display:inline-block;
+}
+
+.departures .destination{
+    width: 1260px;
+    line-height: 200px;
+    font-family: Roboto;
+    color: white;
+    background-color: rgb(25 25 25);
+    font-weight: bold;
+    font-size: 80px;
+    text-align: left;
+    display: inline-block;
+    text-transform: uppercase;
+    position: absolute;
+    padding-left: 20px;
+    border-radius: 20px 0 0 0;
+    border-collapse: collapse;
+    overflow-x: auto;
+}
+
+.departures .timeZoneDiv{
+    background-color: rgb(100 100 100);
+    width: 400px;
+    height: 100px;
+    left: 0px;
+    top:200px;
+    display: block;
+    position: absolute;
+    border-radius: 0 0 20px 0;
+    z-index: 2;
+}
+
+.departures .timeZoneDiv .time{
+    font-size: 80px;
+    font-family: Roboto;
+    font-weight: 400;
+    color: white;
+    padding-left: 70px;
+}
+
+.departures .timeZoneDiv .pres{
+    font-size: 30px;
+    font-family: Roboto;
+    font-weight: 400;
+    padding: 10px 0 0 50px;
+    position: absolute;
+    color: white;
+    text-align: right;
+}
+
+.departures .timeZoneDiv .via{
+    font-size: 30px;
+    font-family: Roboto;
+    font-weight: 300;
+    padding: 50px 0 0 70px;
+    position: absolute;
+    color: white;
+    text-align: right;
+}
+
+.departures .viaStops{
+    display: flex;
+    background-color: rgb(50 50 50);
+    width: 1280px;
+    height: 100px;
+    left: 0px;
+    top: 200px;
+    padding-left: 400px;
+    z-index: -1;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 72px;
+    color: white;
+    overflow-x: auto;
+}
+
+.departures .viaStops::-webkit-scrollbar{
+    display: none;
+}
+@keyframes scrolling {
+  from {
+    translate: 100%;
+  }
+  to {
+    translate: -100%;
+  }
+}
+.departures .viaStops .roller {
+
+    will-change: transform;
+    animation: scrolling 8s linear infinite;
+    display: flex;
+    flex-shrink: 0;
+    padding-right: 50px;
+    gap: 10px;
+}
+
+
