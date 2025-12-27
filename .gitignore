@@ -1,4 +1,8 @@
 options.json
 /res
 /src/icons
-bustec.html
+/bustec
+/node_modules
+package-lock.json
+package.json
+mapa.html

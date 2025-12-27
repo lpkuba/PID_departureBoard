@@ -54,3 +54,28 @@
     color: white;
     background-color: rgb(120 2 0);
 }
+
+.metroA{
+    color: white;
+    background-color: rgb(0 165 98);
+}
+
+.metroB{
+    color: rgb(25 25 25);
+    background-color: rgb(248 179 34);
+}
+
+.metroC{
+    color: white;
+    background-color: rgb(207 0 61);
+}
+
+.metroD{
+    color: white;
+    background-color: rgb(0 140 190);
+}
+
+.train{
+    color: white;
+    background-color: rgb(15 30 65);
+}

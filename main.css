@@ -1,5 +1,6 @@
 body{
     background-color: lightskyblue;
+    font-family: Roboto;
 }
 .dropdown{
    width: 200px;
@@ -104,7 +105,7 @@ body{
 }
 
 .departureBoard .delayTime{
-    color: lightcoral;
+    color: lightgreen;
     font-size: 36px;
     vertical-align: top;
 }
@@ -112,12 +113,26 @@ ol {
     list-style-type: none;
 }
 
+.setup2 {
+    position: fixed;
+    background-color: lightgray;
+    width: 200px;
+    padding: 0;
+    margin: 0;
+    right: 0px;
+    top: 0px;
+    font-size: 24px;
+}
+
+.setup2 #result {
+    font-size: 12px;
+}
+
 .departures {
     top: 0px;
     left: 0px;
     width: 1680px;
     height: 1050px;
-    background-color: white;
     position: absolute;
     float: left;
     z-index: 2;
@@ -130,9 +145,8 @@ ol {
     font-family: Roboto;
     font-weight: bold;
     font-size: 200px;
-    background-color: white;
     text-align: center;
-    display:inline-block;
+    display: inline-block;
 }
 
 .departures .destination{
@@ -142,7 +156,7 @@ ol {
     color: white;
     background-color: rgb(25 25 25);
     font-weight: bold;
-    font-size: 80px;
+    font-size: 100px;
     text-align: left;
     display: inline-block;
     text-transform: uppercase;
@@ -207,6 +221,7 @@ ol {
     font-size: 72px;
     color: white;
     overflow-x: auto;
+    align-items: center;
 }
 
 .departures .viaStops::-webkit-scrollbar{
@@ -223,11 +238,182 @@ ol {
 .departures .viaStops .roller {
 
     will-change: transform;
-    animation: scrolling 8s linear infinite;
+    animation: scrolling 12s linear infinite;
     display: flex;
     flex-shrink: 0;
     padding-right: 50px;
     gap: 10px;
 }
 
+.departures .upcomingStopsContainer{
+    background-color: rgb(25 25 25);
+    height: 445px;
+    width: 1680px;
+    font-size: 72px;
+    font-weight: 400;
+    color: white;
+    padding: 20px 0 20px 0;
+}
 
+.departures .upcomingStopsContainer > img{
+    padding: 16px
+}
+
+.departures .upcomingStopsContainer > div{
+    padding: 13px;
+}
+#sipka0 {
+    position: absolute;
+    left: 152px;
+    bottom: 0px;
+}
+#sipka1 {
+    position: absolute;
+    left: 286px;
+    top: 636px;
+}
+#sipka2 {
+    position: absolute;
+    left: 304px;
+    top: 526px;
+}
+#sipka3 {
+    position: absolute;
+    left: 305px;
+    top: 415px;
+}
+#sipka4 {
+    position: absolute;
+    left: 289px;
+    top: 306px;
+}
+#sipka5 {
+    position: absolute;
+    left: 260px;
+    top: 200px;
+    z-index: 0;
+}
+
+.departures .upcomingStopsContainer .stop4{
+   padding-left: 385px;
+} 
+.departures .upcomingStopsContainer .stop1{
+   padding-left: 385px;
+}   
+.departures .upcomingStopsContainer .stop3{
+   padding-left: 400px;
+} 
+.departures .upcomingStopsContainer .stop2{
+   padding-left: 400px;
+}  
+
+.departures .upcomingStopsContainer .zone4{
+    padding-left: 140px;
+    padding-top: 40px;
+    position: absolute;
+    font-size: 48px;
+    text-align: right;
+    min-width: 120px;
+} 
+.departures .upcomingStopsContainer .zone1{
+    padding-left: 140px;
+    padding-top: 30px;
+    position: absolute;
+    font-size: 48px;
+    text-align: right;
+    min-width: 120px;
+}   
+.departures .upcomingStopsContainer .zone3{
+    padding-left: 150px;
+    padding-top: 40px;
+    position: absolute;
+    font-size: 48px;
+    min-width: 120px;
+    text-align: right;
+} 
+.departures .upcomingStopsContainer .zone2{
+    padding-left: 150px;
+    padding-top: 30px;
+    position: absolute;
+    font-size: 48px;
+    min-width: 120px;
+    text-align: right;
+}    
+
+
+.departures .nextStopContainer{
+    background-color: rgb(50 50 50);
+}
+
+.departures .nextStopContainer .header{
+    width: 1380px;
+    height: 50px;
+    font-size: 30px;
+    padding-left: 350px;
+    display: flex;
+    align-items: center;
+}
+
+.departures .nextStopContainer .content{
+
+    width: 1380px;
+    height: 215px;
+
+    display: flex;
+    align-items: flex-start;
+}
+
+.departures .nextStopName{
+    font-size: 90px;
+    color: white;
+    font-weight: 600;
+    padding-left: 350px;
+    min-height: 120px;
+}
+
+.departures .nextStopContainer .header .nextStopHelperCZ{
+    color: white;
+    font-weight: 400;
+}
+.departures .nextStopContainer .header .nextStopHelperEN{
+    color: rgb(150 150 150);
+    font-weight: 300;
+}
+
+.departures .nextStopContainer .zone0 {
+    min-width: 200px;
+    padding-top: 64px;
+    position: absolute;
+    font-size: 72px;
+    text-align: right;
+    color: white;
+}
+
+.departures .nextStopContainer .zoneHelperCZ{
+    font-size: 30px;
+    font-weight: 400;
+    position: absolute;
+    color: white;
+    text-align: right;
+    bottom: 50px;
+    left: 15px;
+}
+
+.departures .nextStopContainer .zoneHelperEN{
+    font-size: 30px;
+    font-weight: 300;
+    position: absolute;
+    color: rgb(150 150 150);
+    text-align: right;
+    bottom: 15px;
+    left: 15px;
+}
+
+@media screen and (max-width: 600px) {
+  .setup2 {
+    bottom: 0px;
+    right: auto;
+    top: auto;
+    left: 0px
+  }
+}
