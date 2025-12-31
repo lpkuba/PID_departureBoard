@@ -30,11 +30,11 @@
     background-color: white;
 
 }
-.replacement{
-    color: rgb(255 170 30);
-    background-color: white;
 
+.replacement{
+    background-color: rgb(255 170 30);
 }
+
 .otherBus{
     color: rgb(150 150 150);
     background-color: white;
@@ -78,4 +78,9 @@
 .train{
     color: white;
     background-color: rgb(15 30 65);
+}
+
+.ferry{
+    color: rgb(0 164 167);
+    background-color: white;
 }

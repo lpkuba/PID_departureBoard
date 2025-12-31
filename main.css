@@ -139,7 +139,7 @@ ol {
     font-size: 0;
 }
 
-.departures .line{
+.departures > .line{
     width: 400px;
     line-height: 200px;
     font-family: Roboto;
@@ -149,7 +149,7 @@ ol {
     display: inline-block;
 }
 
-.departures .destination{
+.departures > .destination{
     width: 1260px;
     line-height: 200px;
     font-family: Roboto;
@@ -158,13 +158,14 @@ ol {
     font-weight: bold;
     font-size: 100px;
     text-align: left;
-    display: inline-block;
+    display: inline-flex;
     text-transform: uppercase;
     position: absolute;
     padding-left: 20px;
     border-radius: 20px 0 0 0;
     border-collapse: collapse;
     overflow-x: auto;
+    align-items: center;
 }
 
 .departures .timeZoneDiv{
@@ -262,6 +263,14 @@ ol {
 .departures .upcomingStopsContainer > div{
     padding: 13px;
 }
+
+.upcomingStopsContainer span > img{
+    margin: 0 10px 0 10px;
+}
+
+.destination img{
+    margin: 0 10px 0 10px;
+}
 #sipka0 {
     position: absolute;
     left: 152px;
@@ -295,16 +304,24 @@ ol {
 }
 
 .departures .upcomingStopsContainer .stop4{
-   padding-left: 385px;
+    padding-left: 385px;
+    min-height: 87px;
+
 } 
 .departures .upcomingStopsContainer .stop1{
-   padding-left: 385px;
+    padding-left: 385px;
+    min-height: 87px;
+
 }   
 .departures .upcomingStopsContainer .stop3{
-   padding-left: 400px;
+    padding-left: 400px;
+    min-height: 87px;
+
 } 
 .departures .upcomingStopsContainer .stop2{
-   padding-left: 400px;
+    padding-left: 400px;
+    min-height: 87px;
+
 }  
 
 .departures .upcomingStopsContainer .zone4{
@@ -314,6 +331,7 @@ ol {
     font-size: 48px;
     text-align: right;
     min-width: 120px;
+    min-height: 48px;
 } 
 .departures .upcomingStopsContainer .zone1{
     padding-left: 140px;
@@ -322,6 +340,8 @@ ol {
     font-size: 48px;
     text-align: right;
     min-width: 120px;
+    min-height: 48px;
+
 }   
 .departures .upcomingStopsContainer .zone3{
     padding-left: 150px;
@@ -330,6 +350,8 @@ ol {
     font-size: 48px;
     min-width: 120px;
     text-align: right;
+    min-height: 48px;
+
 } 
 .departures .upcomingStopsContainer .zone2{
     padding-left: 150px;
@@ -338,14 +360,17 @@ ol {
     font-size: 48px;
     min-width: 120px;
     text-align: right;
+    min-height: 48px;
+
 }    
 
 
-.departures .nextStopContainer{
+.departures #nextStopContainer{
     background-color: rgb(50 50 50);
+    color: white;
 }
 
-.departures .nextStopContainer .header{
+.departures #nextStopContainer .header{
     width: 1380px;
     height: 50px;
     font-size: 30px;
@@ -354,52 +379,128 @@ ol {
     align-items: center;
 }
 
-.departures .nextStopContainer .content{
-
-    width: 1380px;
+.departures #nextStopContainer .content{
+    width: 1680px;
     height: 215px;
-
     display: flex;
     align-items: flex-start;
 }
 
-.departures .nextStopName{
-    font-size: 90px;
+.departures #nextStopContainer .content .active .nextStopName,
+.departures #nextStopContainer .active, 
+.departures #nextStopContainer .content .active,
+.departures #nextStopContainer.active #zone0,
+.departures #nextStopContainer .content .active .zoneHelperCZ,
+.departures #nextStopContainer .content .active .zoneHelperCZ
+{
+    background-color: rgb(180 180 180);
+    color: rgb(50 50 50);
+}
+
+#upcomingStopsInfoPane{
+    background-color: rgb(25 25 25);
+    z-index: 2;
+    position: relative;
+    padding: 15px 0 20px 0;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+#upcomingStopsInfoPane[hidden]{
+    display: none;
+}
+
+#upcomingStopsInfoPane > div:nth-child(odd){
+    background-color: rgb(50 50 50);
+}
+
+#upcomingStopsInfoPane div{
+    height: 65px;
+    width: 810px;
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 15px;
+}
+
+#upcomingStopsInfoPane div .line{
+    width: 95px;
+    height: 65px;
+    border-radius: 14px;
+    font-weight: bold;
+    font-size: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#upcomingStopsInfoPane div .arrow{
+    width: 25px;
+    height: 25px;
+    margin: 0 12.5px 0 12.5px;
+}
+
+#upcomingStopsInfoPane div .destination{
+    font-size: 36px;
     color: white;
+}
+
+#upcomingStopsInfoPane div .platform{
+    font-size: 36px;
+    color: white;
+    margin-left: auto;
+    margin-right: 40px;
+}
+
+#upcomingStopsInfoPane div .time{
+    font-size: 36px;
+    color: white;
+    width: 120px;
+    text-align: right;
+}
+
+#upcomingStopsInfoPane .noMoreDeps{
+    font-size: 36px;
+    font-weight: 400;
+    color: rgb(150 150 150);
+    justify-content: center;
+}
+
+.departures #nextStopContainer .content .nextStopName{
+    font-size: 90px;
     font-weight: 600;
     padding-left: 350px;
     min-height: 120px;
 }
 
-.departures .nextStopContainer .header .nextStopHelperCZ{
+#nextStopHelperCZ{
     color: white;
     font-weight: 400;
 }
-.departures .nextStopContainer .header .nextStopHelperEN{
+#nextStopHelperEN{
     color: rgb(150 150 150);
     font-weight: 300;
 }
 
-.departures .nextStopContainer .zone0 {
+.departures #nextStopContainer .zone0 {
     min-width: 200px;
     padding-top: 64px;
     position: absolute;
     font-size: 72px;
     text-align: right;
-    color: white;
 }
 
-.departures .nextStopContainer .zoneHelperCZ{
+.departures #nextStopContainer .zoneHelperCZ{
     font-size: 30px;
     font-weight: 400;
     position: absolute;
-    color: white;
     text-align: right;
     bottom: 50px;
     left: 15px;
 }
 
-.departures .nextStopContainer .zoneHelperEN{
+.departures #nextStopContainer .zoneHelperEN{
     font-size: 30px;
     font-weight: 300;
     position: absolute;
@@ -416,4 +517,15 @@ ol {
     top: auto;
     left: 0px
   }
+}
+
+#diversion {
+    position: absolute;
+    left: 0px;
+    padding: 0 0 0 0;
+    top: 300px;
+}
+
+[hidden]{
+  display:none;
 }

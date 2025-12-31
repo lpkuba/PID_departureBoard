@@ -1,5 +1,5 @@
 let stops = {};
-let stopsMap, stopsMappedArray, fuseStops,  fetchOpt, fuse, selectedStop, updateIntervalId;
+let stopsMap, stopsMappedArray, fuseStops, fetchOpt, fuse, selectedStop, updateIntervalId;
 selectedStop = {};
 selectedStop.uniqueName = "Vyber zastávku!";
 
@@ -218,6 +218,7 @@ async function fetchDepartures(stopId){
 }
 
 async function setBustecTrip(tripId) {
+    console.log("FOREACH!!!!");
     console.log(tripId);
     const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
     const tripInfo = await response.json();
@@ -257,6 +258,9 @@ async function setBustecTrip(tripId) {
                 trip.type += "tbus";
             break;
         }
+        if(tripInfo.route.is_substitute_transport){
+            trip.type += " replacement";
+        }
     trip.line = tripInfo.route.route_short_name;
     if(tripInfo.trip_headsign.startsWith("Praha,")){
         trip.dest = tripInfo.trip_headsign.slice(6);
@@ -264,12 +268,31 @@ async function setBustecTrip(tripId) {
     else{
         trip.dest = tripInfo.trip_headsign;
     }
-    
+    trip.id = tripId;
     trip.stops = [];
     tripInfo.stop_times.forEach(element => {
         const stop = element.stop.properties;
-        trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code});
+        if(stop.zone_id != null){
+            let stopTransfers = [];
+            let searchResult = fuse.search(stop.stop_name).slice(0,1);
+            searchResult[0].item.stops.forEach(nastupiste => {
+                nastupiste.lines.forEach(linka => {
+                    if(linka.type == "metro"){
+                        if(!stopTransfers.includes(linka.type + linka.name)){
+                            stopTransfers.push(linka.type + linka.name);
+                        }
+                    }
+                    else{
+                        if(!stopTransfers.includes(linka.type)){
+                            stopTransfers.push(linka.type);
+                        }
+                    }
+                });
+            });
+            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].item.cis});
+        }
     });
+    console.log(trip);
     await fetch(`http://127.0.0.1:3000/bustec`, {
         method: "POST",
         body: JSON.stringify(trip),
