@@ -139,7 +139,7 @@ async function getDepartures(){
         
         let typ = "";
         if(dep.route.is_night){
-            typ += "night";
+            typ += "night ";
         }
         if(dep.route.is_regional){
             typ += "reg";
@@ -226,6 +226,7 @@ async function setBustecTrip(tripId) {
     console.log(tripInfo);
     let trip = {
         type: "",
+        typeId: 0,
         line: "",
         dest: "",
         id: "",
@@ -233,7 +234,7 @@ async function setBustecTrip(tripId) {
     };
     
         if(tripInfo.route.is_night){
-            trip.type += "night";
+            trip.type += "night ";
         }
         if(tripInfo.route.is_regional){
             trip.type += "reg";
@@ -273,6 +274,7 @@ async function setBustecTrip(tripId) {
         trip.dest = tripInfo.trip_headsign;
     }
     trip.id = tripId;
+    trip.typeId = tripInfo.route.route_type;
     trip.stops = [];
     tripInfo.stop_times.forEach(element => {
         const stop = element.stop.properties;
@@ -287,7 +289,7 @@ async function setBustecTrip(tripId) {
                         }
                     }
                     else{
-                        if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") ){
+                        if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && compareTypes(linka.type, tripInfo.route.route_type)){
                             stopTransfers.push(linka.type);
                         }
                     }
@@ -304,4 +306,40 @@ async function setBustecTrip(tripId) {
            "Content-Type": "application/json",
         }
     });
+}
+
+function compareTypes(num, str){
+    let temp = "";
+
+    switch (num) {
+        case 0:
+            temp = "tram";
+        break;
+        case 1:
+            temp = "metro";
+            temp = tripInfo.route.route_short_name;
+        break;
+        case 2:
+            temp = "train";
+        break;
+        case 3:
+            temp = "bus";
+        break;
+        case 4:
+            temp = "ferry";
+        break;
+        case 7:
+            temp = "funicular";
+        break;
+        case 11:
+            temp = "tbus";
+        break;
+    }
+
+    if(temp == str){
+        return true;
+    }
+    else{
+        return false;
+    }
 }

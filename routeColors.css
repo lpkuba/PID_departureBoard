@@ -17,11 +17,11 @@
     background-color: white;
 
 }
-.nightbus{
+.night.bus{
     background-color: rgb(0 120 160);
     color: white;
 }
-.nightregbus{
+.night.regbus{
     background-color: rgb(9 0 62);
     color: white;
 }
@@ -29,6 +29,10 @@
     color: rgb(143 188 25);
     background-color: white;
 
+}
+
+.night.replacement{
+    color: rgb(255 170 30);
 }
 
 .replacement{
@@ -50,7 +54,7 @@
     background-color: white;
 }
 
-.nighttram{
+.night.tram{
     color: white;
     background-color: rgb(120 2 0);
 }
