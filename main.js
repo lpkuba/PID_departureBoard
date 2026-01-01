@@ -217,129 +217,14 @@ async function fetchDepartures(stopId){
     console.log(await response.text());
 }
 
-async function setBustecTrip(tripId) {
-    console.log("FOREACH!!!!");
+function setBustecTrip(tripId) {
     console.log(tripId);
-    const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
-    const tripInfo = await response.json();
-    //zde dodělat aktuální pozici podle času
-    console.log(tripInfo);
-    let trip = {
-        type: "",
-        typeId: 0,
-        line: "",
-        dest: "",
-        id: "",
-        stops: []
-    };
-    
-        if(tripInfo.route.is_night){
-            trip.type += "night ";
-        }
-        if(tripInfo.route.is_regional){
-            trip.type += "reg";
-        }
-        switch (tripInfo.route.route_type) {
-            case 0:
-                trip.type += "tram";
-            break;
-            case 1:
-                trip.type = "metro";
-                trip.type += tripInfo.route.route_short_name;
-            break;
-            case 2:
-                trip.type = "train";
-            break;
-            case 3:
-                trip.type += "bus";
-            break;
-            case 4:
-                trip.type += "ferry";
-            break;
-            case 7:
-                trip.type += "funicular";
-            break;
-            case 11:
-                trip.type += "tbus";
-            break;
-        }
-        if(tripInfo.route.is_substitute_transport){
-            trip.type += " replacement";
-        }
-    trip.line = tripInfo.route.route_short_name;
-    if(tripInfo.trip_headsign.startsWith("Praha,")){
-        trip.dest = tripInfo.trip_headsign.slice(6);
-    }
-    else{
-        trip.dest = tripInfo.trip_headsign;
-    }
-    trip.id = tripId;
-    trip.typeId = tripInfo.route.route_type;
-    trip.stops = [];
-    tripInfo.stop_times.forEach(element => {
-        const stop = element.stop.properties;
-        if(stop.zone_id != null){
-            let stopTransfers = [];
-            let searchResult = fuse.search(stop.stop_name).slice(0,1);
-            searchResult[0].item.stops.forEach(nastupiste => {
-                nastupiste.lines.forEach(linka => {
-                    if(linka.type == "metro"){
-                        if(!stopTransfers.includes(linka.type + linka.name)){
-                            stopTransfers.push(linka.type + linka.name);
-                        }
-                    }
-                    else{
-                        if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && compareTypes(linka.type, tripInfo.route.route_type)){
-                            stopTransfers.push(linka.type);
-                        }
-                    }
-                });
-            });
-            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].item.cis});
-        }
-    });
-    console.log(trip);
-    await fetch(`http://127.0.0.1:3000/bustec`, {
+    let json = {idTrip: tripId};
+    fetch(`http://127.0.0.1:3000/bustec`, {
         method: "POST",
-        body: JSON.stringify(trip),
+        body: JSON.stringify(json),
         headers: {
            "Content-Type": "application/json",
         }
     });
-}
-
-function compareTypes(num, str){
-    let temp = "";
-
-    switch (num) {
-        case 0:
-            temp = "tram";
-        break;
-        case 1:
-            temp = "metro";
-            temp = tripInfo.route.route_short_name;
-        break;
-        case 2:
-            temp = "train";
-        break;
-        case 3:
-            temp = "bus";
-        break;
-        case 4:
-            temp = "ferry";
-        break;
-        case 7:
-            temp = "funicular";
-        break;
-        case 11:
-            temp = "tbus";
-        break;
-    }
-
-    if(temp == str){
-        return true;
-    }
-    else{
-        return false;
-    }
 }
