@@ -28,7 +28,7 @@ app.post("/bustec", (req, res) => {
 app.get("/status", (req, res) =>{
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.send({
-        ver: "0.0.2",
+        ver: "0.0.3",
         ready: serverReady
     });
 })
