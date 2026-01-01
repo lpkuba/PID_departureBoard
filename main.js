@@ -225,7 +225,11 @@ async function setBustecTrip(tripId) {
     //zde dodělat aktuální pozici podle času
     console.log(tripInfo);
     let trip = {
-        type: ""
+        type: "",
+        line: "",
+        dest: "",
+        id: "",
+        stops: []
     };
     
         if(tripInfo.route.is_night){
@@ -283,7 +287,7 @@ async function setBustecTrip(tripId) {
                         }
                     }
                     else{
-                        if(!stopTransfers.includes(linka.type)){
+                        if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") ){
                             stopTransfers.push(linka.type);
                         }
                     }

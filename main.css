@@ -386,12 +386,12 @@ ol {
     align-items: flex-start;
 }
 
-.departures #nextStopContainer .content .active .nextStopName,
+.departures #nextStopContainer .content.active .nextStopName,
 .departures #nextStopContainer .active, 
-.departures #nextStopContainer .content .active,
+.departures #nextStopContainer .content.active,
 .departures #nextStopContainer.active #zone0,
-.departures #nextStopContainer .content .active .zoneHelperCZ,
-.departures #nextStopContainer .content .active .zoneHelperCZ
+.departures #nextStopContainer .content.active .zoneHelperCZ,
+.departures #nextStopContainer .content.active #transfersHelperCZ
 {
     background-color: rgb(180 180 180);
     color: rgb(50 50 50);
@@ -508,6 +508,34 @@ ol {
     text-align: right;
     bottom: 15px;
     left: 15px;
+}
+
+.departures #nextStopContainer .transfers{
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    flex-direction: column;
+    font-size: 32px;
+    margin: auto 20px 15px auto;
+    height: 75px;
+}
+
+.departures #nextStopContainer .transfers #transferTypes > *{
+    margin-left: 20px;
+}
+
+.transfers #transfersHelperCZ {
+    color: white;
+    font-weight: 400;
+}
+
+.transfers #transfersHelperEN {
+    color: rgb(150 150 150);
+    font-weight: 300;
+}
+
+#nextStopContainer .content #transfers[hidden]{
+    display: none;
 }
 
 @media screen and (max-width: 600px) {
