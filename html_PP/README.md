@@ -2,4 +2,6 @@
 V této složce se nachází celkem precizní klon uživatelského rozhraní PP "Arbor" používaném v autobusech DPP.
 
 Aktuální funkcionalita:
-Zadávání služby
+- Zadávání služby
+- Načtení dat o lince
+- Poslání dat serveru
