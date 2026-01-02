@@ -1,292 +1,44 @@
-let popupVis = 0;
-let sluzbaShown;
+let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval;
 let numpadEditing = false;
-let curMode = "disabled";
-let cas = {};
-//linka 999 bude užita pro manipulační služební a další havěťospoje 
-//směry: 01 => Manipulační Jízda
-//       02 =>    Služební Jízda
-//       03 =>    Servisní Jízda
-//       04 =>    Zvláštní Jízda
-let data = {
+
+const socket = new WebSocket("ws://localhost:3001");
+
+// Connection opened
+
+data = {
     sluzbaFull: "912 51 01",
     slLinka: 912,
     slPoradi: 51,
     slTypDne: 1,
     sluzbaKnown: true,
+    slIndex: 0,
     cil: "Palmovka <B>",
-    sluzbaGoesOverNight: true,
-    sluzbaStartHour: 22,
-    sluzbaEndHour: 5,
-    spoje: [
-        {linka: 999, smer: 99, dep:{h: 21, m: 50}},
-        {linka: 141, smer:  1, dep:{h: 22, m:  0}},
-        {linka: 141, smer:  2, dep:{h: 23, m:  0}},
-        {linka: 141, smer:  1, dep:{h:  0, m:  0}},
-        {linka: 912, smer:  2, dep:{h:  1, m:  0}},
-        {linka: 912, smer:  1, dep:{h:  2, m:  0}},
-        {linka: 912, smer:  2, dep:{h:  3, m:  0}},
-        {linka: 999, smer: 99, dep:{h:  4, m:  0}},
-        {linka: 141, smer:  2, dep:{h:  4, m: 10}},
-        {linka: 999, smer: 99, dep:{h:  5, m:  0}}
-    ],
-    hof: {
-        lines: {
-            "1411": {
-                stops: ["vezlibku_start","komarovska_cm","cernymost_end"],
-                stopMins: [0,1,10],
-                terminus: "cernymost"        
-            },
-            "1412": {
-                stops: ["cernymost_start","komarovska_vz","vezlibku_end"],
-                stopMins: [0,10,1],
-                terminus: "vezlibku"
-            },
-            "9121": {
-                stops: ["vezlibku_start","komarovska_cm","cernymost_end"],
-                stopMins: [0,1,10],
-                terminus: "cernymost"        
-            },
-            "9122": {
-                stops: ["cernymost_start","komarovska_vz","vezlibku_end"],
-                stopMins: [0,10,1],
-                terminus: "vezlibku"
-            },
-            "9991":{
-                stops: ["vezlibku_end", "garaz_ho"],
-                stopMins: [0,20],
-                terminus: "vezlibku"
-            },
-            "9992":{
-                stops: ["garaz_ho","vezlibku_start"],
-                stopMins: [0,20],
-                terminus: "vezlibku"
-            }
-        },
-        stops: {
-            "vezlibku_start": {
-                transfers: "",
-                reqStop: false,
-                ppName: "Ve Žlíbku",
-                zones: "P"
-            },
-            "vezlibku_end": {
-                prestupy: "",
-                reqStop: false,
-                ppName: "Ve Žlíbku",
-                zones: "P"
-            },
-            "komarovska_cm": {
-                transfers: "S",
-                reqStop: false,
-                ppName: "Komárovská",
-                zones: "P"
-            },
-            "komarovska_vz": {
-                prestupy: "S",
-                reqStop: false,
-                ppName: "Komárovská",
-                zones: "P"
-            },
-            "cernymost_start": {
-                transfers: "B,D",
-                reqStop: false,
-                ppName: "Č.Most15",
-                zones: "P"
-            },
-            "cernymost_end": {
-                prestupy: "B,D",
-                reqStop: false,
-                ppName: "Č.MostV1",
-                zones: "P"
-            },
-            "garaz_ho": {
-                prestupy: "",
-                reqStop: false,
-                ppName: "Garáž HO",
-                zones: "P"
-            }
-
-        },
-        termini: {
-            "vezlibku": {
-                id: 1234,
-                ppName: "Ve Žlíbku"
-            },
-            "cernymost": {
-                id: 4321,
-                ppName: "Černý Most <B>"
-            },
-            "garaz_ho": {
-                id: 9906,
-                ppName: "Garáž Hostivař"
-            },  
-            "garaz_kl": {
-                id: 9902,
-                ppName: "Garáž Klíčov"
-            }
-        }
-        
-
-    }
-};
-
-let spojeDb = {
-    
+    stops: [],
+    gtfsTripId: ""
 }
-//tohle vše bude bokem ofc
-let konfigurace = {
-    nazev: "Urbanway",
-    evid: 6756,
-    garaz: 2,
-    trakce: "bus",
-    kasa: false,
-    gps: false,
-    periferie:{
-       oznacovace:[
-        {
-            type: "oznacovac",
-            name: "OznačovačETH 1",
-            error: false
-        },
-        {
-            type: "oznacovac",
-            name: "OznačovačETH 2",
-            error: false
-        },
-        {
-            type: "oznacovac",
-            name: "OznačovačETH 3",
-            error: false
-        },
-        {
-            type: "oznacovac",
-            name: "OznačovačETH 4",
-            error: false
-        },
-        {
-            type: "oznacovac",
-            name: "OznačovačETH 5",
-            error: true
-        }
-       ],
-       panelINT: [
-        {
-            type: "panelINT",
-            name: "LCD multi",
-            error: false  
-        }
-       ],
-       panelEXT: [
-        {
-            type: "panelEXT",
-            name: "Panel přední",
-            pos: "front",
-            error: false
-        },
-        {
-            type: "panelEXT",
-            name: "Panel boční 1",
-            pos: "side",
-            error: false
-        },
-        {
-            type: "panelEXT",
-            name: "Panel boční 2",
-            pos: "side",
-            error: false
-        },
-        {
-            type: "panelEXT",
-            name: "Panel zadní",
-            pos: "rear",
-            error: false
-        }
-       ],
-       hodiny: [
-        {
-            type: "hodiny",
-            name: "ZOCP",
-            error: false
-        }
-       ],
-       poradovky: [
-        {
-            name: "KV1",
-            error: false
-        },
-        {
-            name: "KV2",
-            error: true
-        }
-       ],
-       preference: [
-        {
-            name: "Komunikační ústředna",
-            error: false
-        },
-        {
-            name: " převodník Eth2CAN",
-            error: false
-        },
-        {
-            name: "MRJPreference",
-            error: true
-        }
-       ],
-       casovySpinac: [
-            {
-                name: "Časový Spínač",
-                error: true
-            }
-       ],
-       vysilacka: [
-        {
-            name: "RCA",
-            error: false
-        }
-       ],
-       apc: [
-        {
-            name: "APC1",
-            error: true
-        },
-        {
-            name: "APC2",
-            error: true
-        },
-        {
-            name: "APC3",
-            error: true
-        },
-        {
-            name: "APC4",
-            error: true
-        }
-       ],
-       pokladna: [
-        {
-            name: "Pokladna",
-            error: false
-        }
-       ],
-       mos: {
-        verze: "1.0",
-        age: "???"
-       }
 
-    }
-};
-let dataOut = {};
-let numpadPos = 0;
+liveData = {
+    stopIndex: 0,
+    vehInStop: false,
+    linkaActive: false,
+    timeStr: "init"
+}
+
+socket.addEventListener("open", (event) => {
+  socket.send(JSON.stringify({
+    "name": "pp",
+    "type": "ois",
+    "data": {},
+    "dataType": "config"
+  }))
+})
+
 
 function replaceCharAt(str, index, replacement) {
     return str.substring(0, index) +
          replacement +
     str.substring(index + 1);
 }
-
-
 async function init(){
     //alert("Initialised!");
     //await ... doplnit konfigurací !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -309,27 +61,11 @@ async function init(){
             child.addEventListener("click", popupBtnFunc, false);
         });
     });
-    //cteni sluzby
-    document.getElementById("homeSluzba").innerHTML = data.slLinka.toString().padStart(3, "0") + " " + data.slPoradi.toString().padStart(2, "0") + " " + data.slTypDne.toString().padStart(2, "0"); //prasarnicka ale funkcni
+    document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
     document.getElementById("popupCilOK").addEventListener("click", popupBtnFunc, false);
+    
+    
 }
-//datum a cas
-setInterval( function () {
-    const date = new Date();
-    const [d, mo, y, h, mi, s] = [
-        String(date.getDate()),
-        String(date.getMonth()),
-        String(date.getFullYear()),
-        String(date.getHours()),
-        String(date.getMinutes()),
-        String(date.getSeconds())
-    ];
-    document.getElementById("homeDatum").innerHTML = `${d.padStart(2, "0")}.${mo.padStart(2, "0")}.${y.slice(2, 5)}`;
-    document.getElementById("homeCas").innerHTML = `${h.padStart(2, "0")}:${mi.padStart(2, "0")}:${s.padStart(2, "0")}`;
-    cas.h = date.getHours();
-    cas.m = date.getMinutes();
-}, 1000);
-
 
 function popupVisFunc(event) {
     console.log(this.id);
@@ -350,9 +86,39 @@ function popupVisFunc(event) {
                 document.getElementById("popupCil_unknown").hidden = false;
             }
         break;
+        case "vyhlasitZastavku":
+            announceStop();
+        break;
             
     }
 }
+
+setInterval( function () {
+    const date = new Date();
+    const [d, mo, y, h, mi, s] = [
+        String(date.getDate()),
+        String(date.getMonth()),
+        String(date.getFullYear()),
+        String(date.getHours()),
+        String(date.getMinutes()),
+        String(date.getSeconds())
+    ];
+    document.getElementById("homeDatum").innerHTML = `${d.padStart(2, "0")}.${mo.padStart(2, "0")}.${y.slice(2, 5)}`;
+    document.getElementById("homeCas").innerHTML = `${h.padStart(2, "0")}:${mi.padStart(2, "0")}:${s.padStart(2, "0")}`;
+    cas.mi = date.getMinutes();
+    cas.h = date.getHours();
+    if(liveData.linkaActive){
+        const timeInMinutes = cas.mi + (cas.h * 60);
+
+
+        socket.send(JSON.stringify({
+          "name": "pp",
+          "type": "ois",
+          "dataType": "liveData",
+          "data": liveData
+        }))
+    }
+}, 1000);
 
 function popupBtnFunc(event) {
     console.log(event);
@@ -363,6 +129,7 @@ function popupBtnFunc(event) {
     else if(this.id == "popupCilOK"){
         document.getElementById("popupCil_known").hidden = true;
     }
+
 }
 
 function numpadHandler(key, loopback) {
@@ -537,17 +304,76 @@ function numpadHandler(key, loopback) {
     numpadHandler("refresh", sluzbaShown);
 }
 
-function loadRouteData() {
+async function loadRouteData() {
+    liveData.stopIndex = 0;
+    let temp = {};
+    data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
+    document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
     try {
-        
+        result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
+        temp = await result.json();
+        console.log(temp);
+        const nowMinutes = cas.h * 60 + cas.mi;
+        let nearestTime = {time: 99999};
+        for (let i = 0; i < temp.trips.length; i++) {
+            console.log("Forloop! " + i);
+            const element = temp.trips[i];
+            console.log(element);
+            if((element.departure_minutes - nowMinutes) < nearestTime.time && (element.departure_minutes - nowMinutes) >= 0){
+                nearestTime.time = element.departure_minutes - nowMinutes;
+                nearestTime.index = i;
+            }
+            else{
+                nearestTime.time = element.departure_minutes - nowMinutes;
+                nearestTime.index = 0;
+            }
+        }
+        next = temp.trips[nearestTime.index];
+        console.log(nearestTime);
+        data.slIndex = nearestTime.index;
+        liveData.linkaActive = true;
+        setTripData(next);
     } catch (error) {
-        
+        liveData.linkaActive = false;
+        console.error(error);
     }
-    document.getElementById("homeSluzba").innerHTML = sluzbaShown;
-    //zde bude komunikace s vnějším EXE pro získání routeData
-    console.log("Načteno!");
 }
 
-function sendRouteData(){
 
+function setTripData(trip){
+    data.sluzbaFull = `${trip.route.route_short_name.padStart(3, "0")} ${data.slPoradi.padStart(2, "0")} ${data.slTypDne.padStart(2, "0")}`;
+    data.stops = trip.stop_times;
+    data.cil = trip.trip_headsign;
+    data.gtfsTripId = trip.trip_id;
+    //Update textfield
+
+    document.getElementById("cilText").innerHTML = data.cil;
+    updateTextFields();
+    sendTripData(trip);
+
+}
+
+function sendTripData(data){
+    socket.send(JSON.stringify({
+      "name": "pp",
+      "type": "ois",
+      "dataType": "routeData",
+      "data": data
+    }))
+}
+
+function announceStop() {
+    if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length){
+        liveData.stopIndex++;
+        liveData.vehInStop = false;
+        updateTextFields();
+    }
+    else{
+        liveData.vehInStop = true;
+    }
+}
+
+function updateTextFields() {
+    document.getElementById("homeJmenoZast").innerHTML = data.stops[liveData.stopIndex].stop.properties.stop_name;
+    document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
 }

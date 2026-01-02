@@ -5,23 +5,47 @@ const csv = require('csv-parser');
 const Fuse = require("fuse.js");
 const app = express();
 const { WebSocketServer } = require('ws');
+let data = null;
 
 const wss = new WebSocketServer({port: 3001});
+console.log("WS server připraven! Adresa: " + wss.address().address + wss.address().port);
 const clients = [];
 wss.on('error', console.error);
 wss.on('connection', ws => {
     ws.on('message', msg =>{
-        const data = JSON.parse(msg.toString());
+        let wsData = JSON.parse(msg.toString());
+        //console.log(wsData);
+        
+        let sendData = "";
         if(ws.name == "pp"){
-            let bustecClients = clients.filter((client) => client.name == "bustec");
-            /*for (let i = 0; i < bustecClients.length; i++) {
-                const element = bustecClients[i];
-                element.send(data);
-            }*/
+            console.log("Příchozí zpráva z PPčka!");
+            if(wsData.dataType == "routeData"){
+                console.log("Před asyncem");
+                console.log(wsData.data.trip_id);
+                (async () => {
+                    console.log("V asyncu");
+                    wsData.data = await setBustecTrip(wsData.data.trip_id);
+                    wsData.dataType = "routeData";
+                    let bustecClients = clients.filter((client) => client.name == "bustec");
+                    for (let i = 0; i < bustecClients.length; i++) {
+                        const element = bustecClients[i];
+                        element.send(JSON.stringify(wsData));
+                    }
+                })();
+            }
+            else{
+                let bustecClients = clients.filter((client) => client.name == "bustec");
+                for (let i = 0; i < bustecClients.length; i++) {
+                    const element = bustecClients[i];
+                    element.send(JSON.stringify(wsData));
+                }
+            }
+
+            
         }
         else{
-            if (data.type === 'ois') {
-              ws.name = data.name;
+            if (wsData.type === 'ois') {
+              ws.name = wsData.name;
               clients.push(ws);
               console.log('Připojen:', ws.name);
             }
@@ -35,7 +59,6 @@ wss.on('connection', ws => {
     })
 })
 
-
 const fetchOpt = require("./options.json");
 const stops = require("./src/stops.json");
 const fuse = new Fuse(stops.stopGroups,{
@@ -44,7 +67,7 @@ const fuse = new Fuse(stops.stopGroups,{
         limit: 10
 });
 
-let data = null;
+
 let serverReady = false;
 
 app.use(express.json());
@@ -76,6 +99,8 @@ app.listen(3000, () => {
 });
 
 async function setBustecTrip(tripId) {
+    console.log("před promise v setBustecTrip");
+    return new Promise(async (resolve, reject) => {
     console.log("FOREACH!!!!");
     console.log(tripId);
     const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
@@ -157,6 +182,8 @@ async function setBustecTrip(tripId) {
         }
     });
     data = trip;
+    resolve(data);
+    })
 }
 
 function compareTypes(num, str){

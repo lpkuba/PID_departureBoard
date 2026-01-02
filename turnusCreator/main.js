@@ -85,9 +85,16 @@ async function generateJSON(){
         const element = childElements[i];
         result = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${element.dataset.tripid}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
         tripInfo = await result.json();
-        console.log(tripInfo);
+        //console.log(tripInfo);
+        tripInfo.departure_minutes = toMinutes(tripInfo.stop_times[0].departure_time);
+        for (let x = 0; x < tripInfo.stop_times.length; x++) {
+            const element = tripInfo.stop_times[x];
+            tripInfo.stop_times[x].departure_minutes = toMinutes(tripInfo.stop_times[x].departure_time);
+        }
         tripsInService.push(tripInfo);
     }
+    tripsInService.sort((a, b) => a.stop_times[0].departure_time < b.stop_times[0].departure_time ? -1 : 1);
+    console.log(tripsInService);
     currentService = {
         line: document.getElementById("linka").value.padStart(3, "0"),
         service: document.getElementById("poradi").value.padStart(2, "0"),
@@ -120,3 +127,8 @@ function downloadJSON(){
     document.body.removeChild(a);
         
 }
+
+const toMinutes = time => {
+  const [h, m] = time.split(":").map(Number);
+  return h * 60 + m;
+};

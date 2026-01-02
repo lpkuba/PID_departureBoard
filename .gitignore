@@ -9,7 +9,7 @@ mapa.html
 run.bat
 /routeData
 /gtfs/*/
-*test.js
+*test*
 /html_PP/icons/*
 /html_PP/main *
 /services/
