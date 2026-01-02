@@ -1,0 +1,229 @@
+body{
+    background-color: black;
+}
+.content{
+    width: 796px;
+    height: 596px;
+    background-image: linear-gradient(#E8E8F4, darkblue);
+    display: flex;
+    position: relative;
+}
+.firstDiv{
+    /*background: rgba(255, 255, 255, 0.2);*/
+    height: 208px; 
+    width: 796px;
+}
+.popisek{
+    font-size: 21px;
+    font-family: Arial;
+    pointer-events: none; /*důležitá věc*/
+    user-select: none; /*důležitá věc*/
+    font-weight: 545;
+    margin: 0px 4px 0px 4px;
+    text-align: center;
+    display: inline-block;
+    
+}
+.almSqrBg{
+    background-color: white;
+    font-family: Arial;
+    font-weight: normal;
+    pointer-events: none; /*důležitá věc*/
+    user-select: none; /*důležitá věc*/
+    height: 74px;
+    margin: 0px 4px 0px 4px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 58px;
+    letter-spacing: -3px;
+    
+}
+.almSqrBg .item{
+    margin: 4px 0 3px 0;
+}
+.firstRow{
+    margin-top: 4px;
+    display: flex;
+}
+.secondRow{
+    margin-bottom: 8px;
+    display: flex;
+}
+/*tady níž snad levá část čudlíků*/
+.leftBtnTable{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    width: 230px;
+    height: 298px;
+    /*background: rgba(255, 255, 255, 0.2); - debug*/
+    padding-left: 4px;
+}
+.leftBtnTable .button{
+    display: flex;
+    margin: 0 3px 3px 0;
+    width: 69px;
+    height: 69px;
+    background-color: #DCDAD5;
+    box-shadow: 1px 1px black;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /*důležitá věc*/
+}
+.leftBtnTable .button:hover{
+    background-color: #EDEBE6;
+}
+.leftBtnTable .button img{
+    width: 64px;
+    height: 64px;
+}
+    
+.leftBtnTable .row{
+    display: flex;
+}
+/*tady níž snad PRAVÁ část čudlíků*/
+.rightBtnTable{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 482px;
+    height: 296px;
+}
+.rightBtnTable .button{
+    display: flex;
+    margin: 0 3px 3px 0;
+    width: 115px;
+    height: 93px;
+    background-color: #DCDAD5;
+    box-shadow: 1px 1px black;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+    align-items: center;
+    justify-content: center;
+    user-select: none; /*důležitá věc*/
+    font-size: 32px;
+    font-family: Arial;
+}
+.rightBtnTable .button:hover{
+    background-color: #EDEBE6;
+}
+.rightBtnTable .row{
+    display: flex;
+}
+.popup{
+    background-image: linear-gradient(#0A0B80, #5f7091);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50%;
+    border: rgb(0, 0, 53) solid 2px;
+}
+/*====POPUP SLUZBA====*/
+.sluzba{
+    width: 481px;
+    height: 536px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-bottom: 8px;
+    padding-top: 16px;
+    text-align: center;
+    user-select: none;
+}
+.sluzba .popisek{
+    font-size: 37px;
+    font-family: Arial;
+    letter-spacing: 0px;
+    color: white;
+    margin-bottom: 12px;
+}
+.sluzba .numpad{
+    margin: 9px 0 9px 0;
+}
+.sluzba .numpad .row{
+    display: flex;
+}
+.sluzba .numpad .button{
+    display: flex;
+    margin: 0 3px 3px 0;
+    width: 116px;
+    height: 95px;
+    background-color: #DCDAD5;
+    box-shadow: 1px 1px black;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+    align-items: center;
+    justify-content: center;
+    
+    font-size: 56px;
+    font-family: Arial;
+}
+.sluzba .numpad .button:hover{
+    background-color: #EDEBE6;
+}
+
+.numSelected{
+    text-decoration: solid underline;
+    text-underline-offset: 5px;
+}
+
+.clickableBtnGlobal.button:active{
+    box-shadow: 1px 1px black inset;
+    border-bottom: 1px solid white;
+    border-right: 1px solid white;
+    border-left: 1px solid gray;
+    border-top: 1px solid gray;
+}
+/*====POPUP CILE====*/
+.popup.cil{
+    background-image: linear-gradient(#090A80, #1E2284);
+    width: 330px;
+    height: 136px;
+    text-align: left;
+    font-family: Arial;
+    justify-content: center;
+    user-select: none; /*důležitá věc*/
+}
+
+.cil .text{
+    font-size: 30px;
+    letter-spacing: 0px;
+    color: white;
+    margin: 12px;
+}
+
+.cil .obsah{
+    margin:auto;
+}
+
+.cil .button{
+    display: flex;
+    margin: 0 auto;
+    width: 117px;
+    height: 29px;
+    background-color: #DCDAD5;
+    box-shadow: 1px 1px black;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid gray;
+    border-bottom: 1px solid gray;
+    color: black;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+
+}
+
+.cil .button:hover{
+    background-color: #EDEBE6;
+}
+
+

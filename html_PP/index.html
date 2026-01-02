@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wannabe PPčko</title>
+    <link rel="stylesheet" href="./PP.css">
+    <script src="./main.js"></script>
+</head>
+<body onload="init()">
+    <div class="content">
+        <div class="firstDiv">
+            <!--Popisky první řádek-->
+            <div class="firstRow">
+                <div class="popisek" style="width: 80px;">
+                    <span>Příznak</span>
+                </div>
+                <div class="popisek" style="width: 369px;">
+                    <span>Zastávka</span>
+                </div>
+                <div class="popisek" style="width: 140px;">
+                    <span>Čas JŘ</span>
+                </div>
+                <div class="popisek" style="width: 175px;">
+                    <span>Odchylka</span>
+                </div>
+            </div>
+            <!--Hodnoty první řádek-->
+            <div class="secondRow">
+                <div class="almSqrBg" style="width: 80px;">
+                    <div class="item" id="homePriznak"></div>
+                </div>
+                <div class="almSqrBg" style="width: 369px;">
+                    <div class="item" id="homeJmenoZast">Š.Za.Stodol.</div>
+                </div>
+                <div class="almSqrBg" style="width: 140px;">
+                    <div class="item" id="homeCasJR">10:55</div>
+                </div>
+                <div class="almSqrBg" style="width: 175px;">
+                    <div class="item" id="homeOdchylka">+00:42</div>
+                </div>
+            </div>
+            <!--Popisky druhý řádek-->
+            <div class="firstRow">
+                <div class="popisek" style="width: 80px;">
+                    <span>Pásmo</span>
+                </div>
+                <div class="popisek" style="width: 249px;">
+                    <span>Služba</span>
+                </div>
+                <div class="popisek" style="width: 220px;">
+                    <span>Datum</span>
+                </div>
+                <div class="popisek" style="width: 215px;">
+                    <span>Čas</span>
+                </div>
+            </div>
+            <!--Hodnoty druhý řádek-->
+            <div class="secondRow">
+                <div class="almSqrBg" style="width: 80px;">
+                    <div class="item" id="homePasmo">1</div>
+                </div>
+                <div class="almSqrBg" style="width: 249px;">
+                    <div class="item" id="homeSluzba"></div>
+                </div>
+                <div class="almSqrBg" style="width: 220px;">
+                    <div class="item" id="homeDatum"></div>
+                </div>
+                <div class="almSqrBg" style="width: 215px;">
+                    <div class="item" id="homeCas"></div>
+                </div>
+            </div>
+        </div>
+        <!--Níže tabulky čudlíků-->
+            <!--Levá tabulka-->
+        <div class="leftBtnTable">
+            <div class="row">
+                <div class="button"><img src="./icons/GCS_OFF_64x64.png" width="64px" height="64px"></div>
+            </div>
+            <div class="row">
+                <div class="button"><img src="./icons/TisenON64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/but_kupon64x64_state2.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/cash_register.png" width="64px" height="64px"></div>
+            </div>
+            <div class="row">
+                <div class="button"><img src="./icons/PerifERR64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/Oznacovac64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/but_jas64x64_state1.png" width="64px" height="64px"></div>
+            </div>
+            <div class="row">
+                <div class="button"><img src="./icons/SignalOFF64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/PrihlOFF64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/ZvonekOFF64.png" width="64px" height="64px"></div>
+            </div>
+        </div>
+            <!--Pravá tabulka-->
+        <div class="rightBtnTable">
+            <div class="row">
+                <div class="button">VR+KA</div>
+                <div class="button"><img src="./icons/Kamera364.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/Servis64.png" width="64px" height="64px"></div>
+                <div class="button" id="cil">Cíl</div>
+            </div>
+            <div class="row">
+                <div class="button">KL+HO</div>
+                <div class="button"><img src="./icons/Vysilacka64.png" width="64px" height="64px"></div>
+                <div class="button"><img src="./icons/Budik64.png" width="64px" height="64px"></div>
+                <div class="button">Poloha</div>
+            </div>
+            <div class="row">
+                <div class="button">ŘE</div>
+                <div class="button"><img src="./icons/Mikrofon264.png" width="64px" height="64px"></div>
+                <div class="clickableBtnGlobal button"><img src="./icons/Repro64.png" width="64px" height="64px"></div>
+                <div class="button" id="sluzba">Služba</div>
+            </div>
+        </div>
+        <!--Popup pro výběr služby-->
+        <div class="popup sluzba" id="popupSluzba" hidden>
+            <div class="popisek">
+                <span>Zadejte číslo služby</span>
+            </div>
+            <div class="almSqrBg" style="margin: 0; letter-spacing: 1px;" id="sluzbaField">Chyba!</div>
+            <div class="numpad" id="numpadMain">
+                <div class="row">
+                    <div class="clickableBtnGlobal button" id="numpad1">1</div>
+                    <div class="clickableBtnGlobal button" id="numpad2">2</div>
+                    <div class="clickableBtnGlobal button" id="numpad3" style="width:117px;">3</div>
+                    <div class="clickableBtnGlobal button" id="numpadBack" style="width:117px; margin-right: 0;"><img src="./icons/BackSpaceIcon64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" id="numpad4">4</div>
+                    <div class="clickableBtnGlobal button" id="numpad5">5</div>
+                    <div class="clickableBtnGlobal button" id="numpad6" style="width:117px;">6</div>
+                    <div class="clickableBtnGlobal button" id="numpadLeft" style="width:117px; margin-right: 0;"><img src="./icons/Sipka_L64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" id="numpad7">7</div>
+                    <div class="clickableBtnGlobal button" id="numpad8">8</div>
+                    <div class="clickableBtnGlobal button" id="numpad9" style="width:117px;">9</div>
+                    <div class="clickableBtnGlobal button" id="numpadRight" style="width:117px; margin-right: 0;"><img src="./icons/Sipka_R64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" id="numpad0">0</div>
+                    <div class="clickableBtnGlobal button" style="opacity: 0;"></div>
+                    <div class="button" style="width:117px;" id="numpadYes"><img src="./icons/Potvrd64.png" width="64px" height="64px"></div>
+                    <div class="button" style="width:117px; margin-right: 0;" id="numpadNo"><img src="./icons/Zrus64.png" width="64px" height="64px" ></div>
+                </div>
+            </div>
+        </div>
+        <div class="popup cil" id="popupCil_known">
+            <div class="obsah">
+                <div class="text">
+                    <span>Spoj jede do zastávky:</span>
+                    <span style="text-align: left;" id="cilText">Černý Most &lt;B&gt;</span>
+                    
+                </div>
+                <div class="button" id="popupCilOK">OK</div>
+            </div>
+
+        </div>
+    </div>
+    
+</body>
+</html>
