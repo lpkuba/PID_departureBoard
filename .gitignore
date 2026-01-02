@@ -8,3 +8,8 @@ package.json
 mapa.html
 run.bat
 /routeData
+/gtfs/*/
+*test.js
+/html_PP/icons/*
+/html_PP/main *
+/services/

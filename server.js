@@ -1,7 +1,40 @@
 const express = require("express");
 const cors = require("cors");
+const fs = require("fs");
+const csv = require('csv-parser');
 const Fuse = require("fuse.js");
 const app = express();
+const { WebSocketServer } = require('ws');
+
+const wss = new WebSocketServer({port: 3001});
+const clients = [];
+wss.on('error', console.error);
+wss.on('connection', ws => {
+    ws.on('message', msg =>{
+        const data = JSON.parse(msg.toString());
+        if(ws.name == "pp"){
+            let bustecClients = clients.filter((client) => client.name == "bustec");
+            /*for (let i = 0; i < bustecClients.length; i++) {
+                const element = bustecClients[i];
+                element.send(data);
+            }*/
+        }
+        else{
+            if (data.type === 'ois') {
+              ws.name = data.name;
+              clients.push(ws);
+              console.log('Připojen:', ws.name);
+            }
+        }
+    });
+    ws.on('close', () =>{
+        const index = clients.indexOf(ws);
+        if(index !== -1){
+            clients.splice(index, 1);
+        }
+    })
+})
+
 
 const fetchOpt = require("./options.json");
 const stops = require("./src/stops.json");
@@ -9,7 +42,7 @@ const fuse = new Fuse(stops.stopGroups,{
         keys: [{name:'uniqueName', weight: 3}, {name:'stops.altIdosName', weight: 1}],
         threshold: 0.3,
         limit: 10
-    });
+});
 
 let data = null;
 let serverReady = false;
