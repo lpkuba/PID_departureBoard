@@ -1,0 +1,3 @@
+# Nástroj pro tvorbu souborů s turnusy pro PP
+Tento nástroj umožňuje interaktivní tvorbu souborů s turnusy, získává data z GTFS a následně stáhne jako JSON...
+Pro správnou funcionalitu je třeba vložit daný JSON do složky /services v kořenové složce repozitáře.
