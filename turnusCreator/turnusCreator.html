@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tvůrce Turnusů</title>
+    <script src="./main.js"></script>
+    <link rel="stylesheet" href="./main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body onload="init()">
+    <div class="main">
+        <div class="config">
+            <label for="hofMode">HOF: </label><input type="radio" id="hofMode" name="modes" onchange="setMode(1)" checked><br>
+            <label for="gtfsMode">GTFS:</label><input type="radio" id="gtfsMode" name="modes" onchange="setMode(2)">
+        </div>
+        <div class="header">
+            <select name="trips" id="tripList" onchange="getRouteTrips(this.value)"></select>
+            <label for="linka">Linka:</label><input type="text" id="linka"><label for="poradi">Pořadí:</label><input type="text" id="poradi"><label for="typDne">Typ dne:</label><input id="typDne" type="text">
+        </div>
+        <div class="content">
+            <div class="toSelect">
+
+            </div>
+            <div class="toSelect">
+
+            </div>
+        </div>
+        <button class="generateJSON" onclick="generateJSON()">VYGENERUJ JSON</button>
+        <div class="result">
+            <textarea id="result" disabled></textarea>
+        </div>
+        <button class="downloadJSON" onclick="downloadJSON()">STÁHNI JSON</button>
+    </div>
+</body>
+</html>
