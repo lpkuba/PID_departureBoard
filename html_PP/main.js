@@ -1,5 +1,6 @@
-let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval;
+let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData;
 let numpadEditing = false;
+let serverReady = false;
 
 const socket = new WebSocket("ws://localhost:3001");
 
@@ -25,6 +26,7 @@ liveData = {
 }
 
 socket.addEventListener("open", (event) => {
+    serverReady = true;
   socket.send(JSON.stringify({
     "name": "pp",
     "type": "ois",
@@ -109,14 +111,21 @@ setInterval( function () {
     cas.h = date.getHours();
     if(liveData.linkaActive){
         const timeInMinutes = cas.mi + (cas.h * 60);
+        if((JSON.stringify(liveData) != prevLiveData) && serverReady){
+            console.log("Odesílám rozdílný data");
+            socket.send(JSON.stringify({
+              "name": "pp",
+              "type": "ois",
+              "dataType": "liveData",
+              "data": liveData
+            }))
+        }
+        else{
+            console.log("Neodesílám totožný data");
 
+            prevLiveData = JSON.stringify(liveData);
+        }
 
-        socket.send(JSON.stringify({
-          "name": "pp",
-          "type": "ois",
-          "dataType": "liveData",
-          "data": liveData
-        }))
     }
 }, 1000);
 
@@ -362,6 +371,15 @@ function sendTripData(data){
     }))
 }
 
+function sendLiveData(){
+    socket.send(JSON.stringify({
+      "name": "pp",
+      "type": "ois",
+      "dataType": "liveData",
+      "data": liveData
+    }))
+}
+
 function announceStop() {
     if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length){
         liveData.stopIndex++;
@@ -374,6 +392,43 @@ function announceStop() {
 }
 
 function updateTextFields() {
-    document.getElementById("homeJmenoZast").innerHTML = data.stops[liveData.stopIndex].stop.properties.stop_name;
+    document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
     document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
+}
+//Šestajovice, Balkán
+function shortenString(str){
+    //const str = "ABCDEFGH, IJKLMNOP";
+    //console.log(str);
+    let strLen = str.length+1;
+    let splitStr = str.split(",");
+    //console.log(strLen);
+    if(strLen > 10){
+        for (let i = 0; i < splitStr.length; i++) {
+            let temp = splitStr[i].trim();
+            //console.log("DELKA: "+ temp.length);
+            for (let x = temp.length; x > 0; x--) {
+                //console.log("HODNOTA X: " +x);
+                //console.log("DELKA KRACENE: " + strLen);
+                strLen--;
+                console.log(strLen);
+                if(strLen > 10){
+                    temp = temp.slice(0,x) + ".";
+                    
+                }
+                else{
+                    break;
+                }
+            }
+            strLen++;
+            splitStr[i] = temp;
+        }
+        let result = "";
+        splitStr.forEach(element => {
+            result += element;
+        })
+        return result;
+    }
+    else{
+        return str;
+    }
 }

@@ -6,6 +6,8 @@ const Fuse = require("fuse.js");
 const app = express();
 const { WebSocketServer } = require('ws');
 let data = null;
+let prevWsData = null;
+let wsData = null;
 
 const wss = new WebSocketServer({port: 3001});
 console.log("WS server připraven! Adresa: " + wss.address().address + wss.address().port);
@@ -13,7 +15,15 @@ const clients = [];
 wss.on('error', console.error);
 wss.on('connection', ws => {
     ws.on('message', msg =>{
-        let wsData = JSON.parse(msg.toString());
+        wsData = JSON.parse(msg.toString());
+        let string = msg.toString();
+        console.log(prevWsData);
+        console.log(string);
+        if(string == prevWsData){
+            console.log("Přišla duplicitní zpráva!");
+            return;
+        }
+        prevWsData = string;
         //console.log(wsData);
         
         let sendData = "";
@@ -103,8 +113,15 @@ async function setBustecTrip(tripId) {
     return new Promise(async (resolve, reject) => {
     console.log("FOREACH!!!!");
     console.log(tripId);
-    const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
-    const tripInfo = await response.json();
+    let tripInfo = {};
+    try {
+        const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
+        tripInfo = await response.json();        
+    } catch (err) {
+        console.error(err);
+        return;
+    }
+
     //zde dodělat aktuální pozici podle času
     console.log(tripInfo);
     let trip = {
