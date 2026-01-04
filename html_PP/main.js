@@ -113,19 +113,13 @@ setInterval( function () {
         const timeInMinutes = cas.mi + (cas.h * 60);
         if((JSON.stringify(liveData) != prevLiveData) && serverReady){
             console.log("Odesílám rozdílný data");
-            socket.send(JSON.stringify({
-              "name": "pp",
-              "type": "ois",
-              "dataType": "liveData",
-              "data": liveData
-            }))
+            prevLiveData = JSON.stringify(liveData);
+            sendLiveData(liveData);
         }
         else{
             console.log("Neodesílám totožný data");
-
-            prevLiveData = JSON.stringify(liveData);
         }
-
+        
     }
 }, 1000);
 
@@ -371,12 +365,12 @@ function sendTripData(data){
     }))
 }
 
-function sendLiveData(){
+function sendLiveData(data){
     socket.send(JSON.stringify({
       "name": "pp",
       "type": "ois",
       "dataType": "liveData",
-      "data": liveData
+      "data": data
     }))
 }
 
@@ -394,6 +388,7 @@ function announceStop() {
 function updateTextFields() {
     document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
     document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
+    console.log(data.stops[liveData.stopIndex]);
 }
 //Šestajovice, Balkán
 function shortenString(str){
@@ -401,6 +396,9 @@ function shortenString(str){
     //console.log(str);
     let strLen = str.length+1;
     let splitStr = str.split(",");
+    if(splitStr.length == 1 && strLen > 11){
+        splitStr = str.split(" ");
+    }
     //console.log(strLen);
     if(strLen > 10){
         for (let i = 0; i < splitStr.length; i++) {
