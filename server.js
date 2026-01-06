@@ -5,9 +5,12 @@ const csv = require('csv-parser');
 const Fuse = require("fuse.js");
 const app = express();
 const { WebSocketServer } = require('ws');
+const serverVersion = "0.0.4";
 let data = null;
 let prevWsData = null;
 let wsData = null;
+
+console.log("OIS SERVER INIT VERSION: " + serverVersion);
 
 const wss = new WebSocketServer({port: 3001});
 console.log("WS server připraven! Adresa: " + wss.address().address + wss.address().port);
@@ -19,7 +22,7 @@ wss.on('connection', ws => {
         let string = msg.toString();
         //console.log(prevWsData);
         //console.log(string);
-        if(string == prevWsData){
+        if(string == prevWsData && wsData.dataType != undefined){
             console.log("Přišla duplicitní zpráva!");
             return;
         }
@@ -94,7 +97,7 @@ app.post("/bustec", (req, res) => {
 app.get("/status", (req, res) =>{
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.send({
-        ver: "0.0.3",
+        ver: serverVersion,
         ready: serverReady
     });
 })
