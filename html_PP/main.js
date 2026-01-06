@@ -1,7 +1,11 @@
 let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData;
 let numpadEditing = false;
 let serverReady = false;
-
+let announcement = new Audio();
+let soundQueue = [];
+let playing = false;
+let soundIndex = 0;
+announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
 
 // Connection opened
@@ -375,13 +379,18 @@ function sendLiveData(data){
 }
 
 function announceStop() {
-    if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length){
+    if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length){ //odjezd ze zast
         liveData.stopIndex++;
         liveData.vehInStop = false;
         updateTextFields();
+        document.getElementById("homeStopName").classList.remove("active");
+        hlaseniConstructor(data.stops[liveData.stopIndex].stop.properties.stop_id.split("Z")[0].slice(1), "next");
     }
-    else{
+    else{ //příjezd do zast
         liveData.vehInStop = true;
+        document.getElementById("homeStopName").classList.add("active");
+        hlaseniConstructor(data.stops[liveData.stopIndex].stop.properties.stop_id.split("Z")[0].slice(1), "curr");
+
     }
 }
 
@@ -428,5 +437,57 @@ function shortenString(str){
     }
     else{
         return str;
+    }
+}
+
+function hlaseniConstructor(node, mode){
+    switch (mode) {
+        case "curr":
+            soundQueue.push(hlaseni.gong + ".ogg");            
+        break;
+        case "next":
+            soundQueue.push(hlaseni.pristiZastavka + ".ogg");            
+        break;
+    }
+    soundQueue.push(node + ".ogg");
+    vyhlas();
+}
+
+function vyhlas() {
+    if(soundQueue.length == 0){
+        playing = false;
+        return;
+    }
+
+    playing = true;
+    
+    announcement.src = "./HLASENI/" + soundQueue.shift();
+    announcement.play();
+}
+
+announcement.addEventListener("ended", vyhlas);
+
+function getTransfers(){
+    let stopTransfers = [];
+    let searchResult = stops.stopGroups.filter((data) => data.node == parseInt(stop.stop_id.split("Z")[0].slice(1)));
+    for (let i = 0; i < searchResult.length; i++) {
+        const zastavka = searchResult[i];
+        for (let x = 0; x < zastavka.stops.length; x++) {
+            const nastupiste = zastavka.stops[x];
+            for (let y = 0; y < nastupiste.lines.length; y++) {
+                const linka = nastupiste.lines[y];
+                if(linka.type == "metro"){
+                    if(!stopTransfers.includes(linka.type + linka.name)){
+                        stopTransfers.push(linka.type + linka.name);
+                    }
+                }
+                else{
+                    if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && !compareTypes(linka.type, tripInfo.route.route_type)){
+                        //console.log("Pushuju: " + linka.type);
+                        stopTransfers.push(linka.type);
+                    }
+                }
+            }
+        }
     }
 }

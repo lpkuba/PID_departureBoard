@@ -36,7 +36,10 @@ body{
     vertical-align: middle;
     font-size: 58px;
     letter-spacing: -3px;
-    
+}
+
+.almSqrBg.active{
+    background-color: yellow;
 }
 .almSqrBg .item{
     margin: 4px 0 3px 0;
