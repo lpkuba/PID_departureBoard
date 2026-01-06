@@ -17,8 +17,8 @@ wss.on('connection', ws => {
     ws.on('message', msg =>{
         wsData = JSON.parse(msg.toString());
         let string = msg.toString();
-        console.log(prevWsData);
-        console.log(string);
+        //console.log(prevWsData);
+        //console.log(string);
         if(string == prevWsData){
             console.log("Přišla duplicitní zpráva!");
             return;
@@ -30,10 +30,10 @@ wss.on('connection', ws => {
         if(ws.name == "pp"){
             console.log("Příchozí zpráva z PPčka!");
             if(wsData.dataType == "routeData"){
-                console.log("Před asyncem");
-                console.log(wsData.data.trip_id);
+                //console.log("Před asyncem");
+                //console.log(wsData.data.trip_id);
                 (async () => {
-                    console.log("V asyncu");
+                    //console.log("V asyncu");
                     wsData.data = await setBustecTrip(wsData.data.trip_id);
                     wsData.dataType = "routeData";
                     let bustecClients = clients.filter((client) => client.name == "bustec");
@@ -84,8 +84,8 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/bustec", (req, res) => {
-    console.log(req.body);
-    console.log("tohle má být IDčko");
+    //console.log(req.body);
+    //console.log("tohle má být IDčko");
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.json({ ok: true });
     setBustecTrip(req.body.idTrip);
@@ -104,26 +104,27 @@ app.get("/bustec", (req, res) =>{
     res.send(data);
 })
 app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+  console.log('Express server spuštěn! ADR: http://localhost:3000');
   serverReady = true;
 });
 
 async function setBustecTrip(tripId) {
-    console.log("před promise v setBustecTrip");
+    //console.log("před promise v setBustecTrip");
     return new Promise(async (resolve, reject) => {
-    console.log("FOREACH!!!!");
-    console.log(tripId);
+    //console.log("FOREACH!!!!");
+    //console.log(tripId);
     let tripInfo = {};
     try {
         const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
         tripInfo = await response.json();        
     } catch (err) {
         console.error(err);
+        reject(err);
         return;
     }
 
     //zde dodělat aktuální pozici podle času
-    console.log(tripInfo);
+    //console.log(tripInfo);
     let trip = {
         type: "",
         typeId: 0,
@@ -180,22 +181,29 @@ async function setBustecTrip(tripId) {
         const stop = element.stop.properties;
         if(stop.zone_id != null){
             let stopTransfers = [];
-            let searchResult = fuse.search(stop.stop_name).slice(0,1);
-            searchResult[0].item.stops.forEach(nastupiste => {
-                nastupiste.lines.forEach(linka => {
-                    if(linka.type == "metro"){
-                        if(!stopTransfers.includes(linka.type + linka.name)){
-                            stopTransfers.push(linka.type + linka.name);
+            //let searchResult = fuse.search(stop.stop_name).slice(0,1);
+            let searchResult = stops.stopGroups.filter((data) => data.node == parseInt(stop.stop_id.split("Z")[0].slice(1)));
+            for (let i = 0; i < searchResult.length; i++) {
+                const zastavka = searchResult[i];
+                for (let x = 0; x < zastavka.stops.length; x++) {
+                    const nastupiste = zastavka.stops[x];
+                    for (let y = 0; y < nastupiste.lines.length; y++) {
+                        const linka = nastupiste.lines[y];
+                        if(linka.type == "metro"){
+                            if(!stopTransfers.includes(linka.type + linka.name)){
+                                stopTransfers.push(linka.type + linka.name);
+                            }
+                        }
+                        else{
+                            if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && !compareTypes(linka.type, tripInfo.route.route_type)){
+                                //console.log("Pushuju: " + linka.type);
+                                stopTransfers.push(linka.type);
+                            }
                         }
                     }
-                    else{
-                        if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && compareTypes(linka.type, tripInfo.route.route_type)){
-                            stopTransfers.push(linka.type);
-                        }
-                    }
-                });
-            });
-            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].item.cis});
+                }
+            }
+            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].cis});
         }
     });
     data = trip;
@@ -203,7 +211,7 @@ async function setBustecTrip(tripId) {
     })
 }
 
-function compareTypes(num, str){
+function compareTypes(str, num){
     let temp = "";
 
     switch (num) {
