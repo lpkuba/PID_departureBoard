@@ -1,0 +1,21 @@
+const hlaseni = {
+    gong: "H0",
+    pristiZastavka: "H1",
+    zastavkaNaZnameni: "H2",
+    metro: "H103",
+    metroA: "H104",
+    metroB: "H105",
+    metroC: "H106",
+    metroAB: "H107",
+    metroAC: "H108",
+    metroBC: "H109",
+    konecnaZastavka: "H113",
+    prosimeVystupte: "H114",
+    upozorneniProCestujici: "H115",
+    linka: "H144",
+    smer: "H145",
+    tram: "H168",
+    zmenaTP: "H170",
+    prestupNaLinkuCislo: "H172",
+    train: "H184"
+}

@@ -1,4 +1,4 @@
-let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData;
+let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData, stops;
 let numpadEditing = false;
 let serverReady = false;
 let announcement = new Audio();
@@ -8,7 +8,6 @@ let soundIndex = 0;
 announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
 
-// Connection opened
 
 data = {
     sluzbaFull: "912 51 01",
@@ -70,11 +69,16 @@ async function init(){
     document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
     document.getElementById("popupCilOK").addEventListener("click", popupBtnFunc, false);
     
+    const response = await fetch("../src/stops.json");
+    stops = await response.json();
+
+    //console.log(stops);
+
     
 }
 
 function popupVisFunc(event) {
-    console.log(this.id);
+    //console.log(this.id);
     curMode = this.id;
     switch (this.id) {
         case "sluzba":
@@ -128,8 +132,8 @@ setInterval( function () {
 }, 1000);
 
 function popupBtnFunc(event) {
-    console.log(event);
-    console.log(this);
+    //console.log(event);
+    //console.log(this);
     if(this.id.startsWith("numpad")){
         numpadHandler(this.id,"");
     }
@@ -319,13 +323,13 @@ async function loadRouteData() {
     try {
         result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
         temp = await result.json();
-        console.log(temp);
+        //console.log(temp);
         const nowMinutes = cas.h * 60 + cas.mi;
         let nearestTime = {time: 99999};
         for (let i = 0; i < temp.trips.length; i++) {
-            console.log("Forloop! " + i);
+            //console.log("Forloop! " + i);
             const element = temp.trips[i];
-            console.log(element);
+            //console.log(element);
             if((element.departure_minutes - nowMinutes) < nearestTime.time && (element.departure_minutes - nowMinutes) >= 0){
                 nearestTime.time = element.departure_minutes - nowMinutes;
                 nearestTime.index = i;
@@ -336,7 +340,7 @@ async function loadRouteData() {
             }
         }
         next = temp.trips[nearestTime.index];
-        console.log(nearestTime);
+        //console.log(nearestTime);
         data.slIndex = nearestTime.index;
         liveData.linkaActive = true;
         setTripData(next);
@@ -352,6 +356,7 @@ function setTripData(trip){
     data.stops = trip.stop_times;
     data.cil = trip.trip_headsign;
     data.gtfsTripId = trip.trip_id;
+    data.typVozidla = trip.route.route_type;
     //Update textfield
 
     document.getElementById("cilText").innerHTML = data.cil;
@@ -417,7 +422,7 @@ function shortenString(str){
                 //console.log("HODNOTA X: " +x);
                 //console.log("DELKA KRACENE: " + strLen);
                 strLen--;
-                console.log(strLen);
+                //console.log(strLen);
                 if(strLen > 10){
                     temp = temp.slice(0,x) + ".";
                     
@@ -441,15 +446,26 @@ function shortenString(str){
 }
 
 function hlaseniConstructor(node, mode){
+
+    let transfers = [];
     switch (mode) {
         case "curr":
-            soundQueue.push(hlaseni.gong + ".ogg");            
+            soundQueue.push(hlaseni.gong);    
+            transfers = getTransfers(node);        
         break;
         case "next":
-            soundQueue.push(hlaseni.pristiZastavka + ".ogg");            
+            soundQueue.push(hlaseni.pristiZastavka);            
         break;
     }
-    soundQueue.push(node + ".ogg");
+    soundQueue.push(node);
+    for (let i = 0; i < transfers.length; i++) {
+        const element = transfers[i];
+            if(hlaseni[element] != undefined){
+                soundQueue.push(hlaseni[element]);
+            }
+        
+        
+    }
     vyhlas();
 }
 
@@ -461,33 +477,84 @@ function vyhlas() {
 
     playing = true;
     
-    announcement.src = "./HLASENI/" + soundQueue.shift();
+    announcement.src = "./HLASENI/" + soundQueue.shift() + ".ogg";
     announcement.play();
 }
 
 announcement.addEventListener("ended", vyhlas);
 
-function getTransfers(){
+function getTransfers(node){
     let stopTransfers = [];
-    let searchResult = stops.stopGroups.filter((data) => data.node == parseInt(stop.stop_id.split("Z")[0].slice(1)));
+    let searchResult = stops.stopGroups.filter((elm) => elm.node == parseInt(data.stops[liveData.stopIndex].stop.properties.stop_id.split("Z")[0].slice(1)));
     for (let i = 0; i < searchResult.length; i++) {
         const zastavka = searchResult[i];
+        let metro = [];
         for (let x = 0; x < zastavka.stops.length; x++) {
             const nastupiste = zastavka.stops[x];
             for (let y = 0; y < nastupiste.lines.length; y++) {
                 const linka = nastupiste.lines[y];
+                console.log(linka);
                 if(linka.type == "metro"){
-                    if(!stopTransfers.includes(linka.type + linka.name)){
-                        stopTransfers.push(linka.type + linka.name);
+                    if(!metro.includes(linka.name)){
+                        metro.push(linka.name);
+                        //console.log(linka.name);
                     }
                 }
                 else{
-                    if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && !compareTypes(linka.type, tripInfo.route.route_type)){
+                    if(!stopTransfers.includes(linka.type) && !linka.type.endsWith("tram") && !linka.type.endsWith("bus") && !compareTypes(linka.type, data.typVozidla)){
                         //console.log("Pushuju: " + linka.type);
                         stopTransfers.push(linka.type);
                     }
                 }
             }
         }
+            console.log(metro);
+            if(metro.length > 0){
+                metro.sort();
+                let temp = "metro";
+                stopTransfers.push("metro");
+
+                for (let z = 0; z < metro.length; z++) {
+                    const element = metro[z];
+                    temp += element;
+                }
+                stopTransfers.push(temp);
+            }
+    }
+    return stopTransfers;
+}
+
+function compareTypes(str, num){
+    let temp = "";
+
+    switch (num) {
+        case 0:
+            temp = "tram";
+        break;
+        case 1:
+            temp = "metro";
+        break;
+        case 2:
+            temp = "train";
+        break;
+        case 3:
+            temp = "bus";
+        break;
+        case 4:
+            temp = "ferry";
+        break;
+        case 7:
+            temp = "funicular";
+        break;
+        case 11:
+            temp = "tbus";
+        break;
+    }
+
+    if(temp == str){
+        return true;
+    }
+    else{
+        return false;
     }
 }
