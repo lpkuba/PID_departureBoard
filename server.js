@@ -5,7 +5,7 @@ const csv = require('csv-parser');
 const Fuse = require("fuse.js");
 const app = express();
 const { WebSocketServer } = require('ws');
-const serverVersion = "0.0.4";
+const serverVersion = "0.0.5";
 let data = null;
 let prevWsData = null;
 let wsData = null;
@@ -182,7 +182,8 @@ async function setBustecTrip(tripId) {
     trip.stops = [];
     tripInfo.stop_times.forEach(element => {
         const stop = element.stop.properties;
-        if(stop.zone_id != null){
+        //console.log(stop);
+        if(!stop.stop_id.includes("T")){
             let stopTransfers = [];
             //let searchResult = fuse.search(stop.stop_name).slice(0,1);
             let searchResult = stops.stopGroups.filter((data) => data.node == parseInt(stop.stop_id.split("Z")[0].slice(1)));
@@ -206,7 +207,7 @@ async function setBustecTrip(tripId) {
                     }
                 }
             }
-            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].cis});
+            trip.stops.push({name: stop.stop_name, zone: stop.zone_id, platform: stop.platform_code, transfers: stopTransfers, cisId: searchResult[0].cis, gtfsId: stop.stop_id});
         }
     });
     data = trip;
