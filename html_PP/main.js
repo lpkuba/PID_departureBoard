@@ -68,6 +68,8 @@ async function init(){
     });
     document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
     document.getElementById("popupCilOK").addEventListener("click", popupBtnFunc, false);
+    document.getElementById("homeSluzba").addEventListener("click", () => {hlaseniConstructor(null, "line");});
+
     
     const response = await fetch("../src/stops.json");
     stops = await response.json();
@@ -332,8 +334,7 @@ function numpadHandler(key, loopback) {
 async function loadRouteData() {
     liveData.stopIndex = 0;
     let temp = {};
-    data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
-    document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
+    //data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
     try {
         result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
         temp = await result.json();
@@ -362,8 +363,10 @@ async function loadRouteData() {
         liveData.linkaActive = true;
         setTripData(next);
     } catch (error) {
+        data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
         liveData.linkaActive = false;
         console.error(error);
+        updateTextFields("erase");
     }
 }
 
@@ -416,11 +419,19 @@ function announceStop() {
     }
 }
 
-function updateTextFields() {
-    document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
-    document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
-    document.getElementById("homeCasJR").innerHTML = minutesToTimeFormatted(data.stops[liveData.stopIndex].departure_minutes);
-    console.log(data.stops[liveData.stopIndex]);
+function updateTextFields(mode) {
+    if(mode == undefined){
+        document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
+        document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
+        document.getElementById("homeCasJR").innerHTML = minutesToTimeFormatted(data.stops[liveData.stopIndex].departure_minutes);
+        document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
+        console.log(data.stops[liveData.stopIndex]);
+    }
+    else if(mode == "erase"){
+        document.getElementById("homeJmenoZast").innerHTML = "";
+        document.getElementById("homePasmo").innerHTML = "";
+        document.getElementById("homeCasJR").innerHTML = "";
+    }
 }
 //Šestajovice, Balkán
 function shortenString(str){
@@ -464,7 +475,7 @@ function shortenString(str){
 }
 
 function hlaseniConstructor(node, mode){
-
+    console.log(mode);
     let transfers = [];
     switch (mode) {
         case "curr":
@@ -475,6 +486,27 @@ function hlaseniConstructor(node, mode){
         case "next":
             soundQueue.push(hlaseni.pristiZastavka);  
             soundQueue.push(node);          
+        break;
+        case "line":
+            soundQueue.push(hlaseni.gong);
+            soundQueue.push(hlaseni.linka);
+            let temp = data.sluzbaFull.split(" ");
+            let dvojcislovka = Number(temp[0].slice(1));
+            if(dvojcislovka > 10 && dvojcislovka < 20){
+                soundQueue.push(`C${temp[0][0]}00`);
+                soundQueue.push(`C${dvojcislovka}`);
+            }
+            else{
+                soundQueue.push(`C${temp[0][0]}00`);
+                soundQueue.push(`C${temp[0][1]}0`);
+                soundQueue.push(`C${temp[0][2]}`);
+            }
+            soundQueue.push(hlaseni.smer);
+            try {
+                soundQueue.push(data.stops[data.stops.length-1].stop_id.split("Z")[0].slice(1));
+            } catch (error) {
+                
+            }
         break;
     }
     

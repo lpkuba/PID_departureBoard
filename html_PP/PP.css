@@ -28,7 +28,7 @@ body{
     background-color: white;
     font-family: Arial;
     font-weight: normal;
-    pointer-events: none; /*důležitá věc*/
+    /*pointer-events: none; důležitá věc*/
     user-select: none; /*důležitá věc*/
     height: 74px;
     margin: 0px 4px 0px 4px;
