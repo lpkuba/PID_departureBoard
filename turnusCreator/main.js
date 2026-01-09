@@ -39,7 +39,7 @@ function getRouteTrips(object){
     let startStops = [];
     for (let i = 0; i < currentLineTrips.length; i++) {
         const trip = currentLineTrips[i];
-        startStops.push(stopTimes.filter((element) => element.tripId == trip.tripId)[0]);
+        startStops.push(stopTimes.filter((element) => (element.tripId == trip.tripId))[0]);
     }
     for (let i = 0; i < startStops.length; i++) {
         const start = startStops[i];
@@ -89,6 +89,11 @@ async function generateJSON(){
         tripInfo.departure_minutes = toMinutes(tripInfo.stop_times[0].departure_time);
         for (let x = 0; x < tripInfo.stop_times.length; x++) {
             const element = tripInfo.stop_times[x];
+            if(element.stop_id.startsWith("T")){
+                tripInfo.stop_times.splice(x,1);
+                x--;
+                continue;
+            }
             tripInfo.stop_times[x].departure_minutes = toMinutes(tripInfo.stop_times[x].departure_time);
         }
         tripsInService.push(tripInfo);
@@ -99,6 +104,7 @@ async function generateJSON(){
         line: document.getElementById("linka").value.padStart(3, "0"),
         service: document.getElementById("poradi").value.padStart(2, "0"),
         day: document.getElementById("typDne").value.padStart(2, "0"),
+        dataStructureVersion: "0.0.5",
         trips: tripsInService
     };
     document.getElementById("result").value = JSON.stringify(currentService);
