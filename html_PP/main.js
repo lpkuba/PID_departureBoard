@@ -7,7 +7,7 @@ let playing = false;
 let soundIndex = 0;
 announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
-
+const ppVersion = "0.0.5";
 
 data = {
     sluzbaFull: "912 51 01",
@@ -107,7 +107,7 @@ setInterval( function () {
     const date = new Date();
     const [d, mo, y, h, mi, s] = [
         String(date.getDate()),
-        String(date.getMonth()),
+        String(date.getMonth()+1),
         String(date.getFullYear()),
         String(date.getHours()),
         String(date.getMinutes()),
@@ -117,8 +117,23 @@ setInterval( function () {
     document.getElementById("homeCas").innerHTML = `${h.padStart(2, "0")}:${mi.padStart(2, "0")}:${s.padStart(2, "0")}`;
     cas.mi = date.getMinutes();
     cas.h = date.getHours();
+    cas.s = date.getSeconds();
     if(liveData.linkaActive){
-        const timeInMinutes = cas.mi + (cas.h * 60);
+        let timeInSeconds = cas.mi * 60 + cas.h * 3600 + cas.s;
+        let depInSeconds = data.stops[liveData.stopIndex].departure_minutes * 60;
+        if(cas.h < 8 && depInSeconds > 86400){
+           timeInSeconds += 86400; //přičtení jednoho dne když je čas mezi 0-8 a čas odjezdu je přes 24h (pro noční linky s předchozím provozním dnem)
+        }
+        let odchylka = timeInSeconds - depInSeconds;
+        if(odchylka > 5940){
+            odchylka = 5940;
+        }
+        else if(odchylka < -5940){
+            odchylka = -5940;
+        }
+        let odchylkaString = `${odchylka > 0 ? "+" : "-"}${String(Math.floor(Math.abs(odchylka)/60)).padStart(2,"0")}:${String(Math.abs(odchylka)%60).padStart(2,"0")}`
+        document.getElementById("homeOdchylka").innerHTML = odchylkaString;
+        document.getElementById("homeOdchylka").style.color = odchylka >= 0 ? "black" : "red";
         if((JSON.stringify(liveData) != prevLiveData) && serverReady){
             console.log("Odesílám rozdílný data");
             prevLiveData = JSON.stringify(liveData);
@@ -127,7 +142,6 @@ setInterval( function () {
         else{
             console.log("Neodesílám totožný data");
         }
-        
     }
 }, 1000);
 
@@ -323,6 +337,9 @@ async function loadRouteData() {
     try {
         result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
         temp = await result.json();
+        if(temp.dataStructureVersion !== ppVersion){
+            alert("Nekompatibilní pořadí s touto verzí PP! Očekávej problémy.");
+        }
         //console.log(temp);
         const nowMinutes = cas.h * 60 + cas.mi;
         let nearestTime = {time: 99999};
@@ -384,7 +401,7 @@ function sendLiveData(data){
 }
 
 function announceStop() {
-    if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length){ //odjezd ze zast
+    if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length-1){ //odjezd ze zast
         liveData.stopIndex++;
         liveData.vehInStop = false;
         updateTextFields();
@@ -402,6 +419,7 @@ function announceStop() {
 function updateTextFields() {
     document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
     document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
+    document.getElementById("homeCasJR").innerHTML = minutesToTimeFormatted(data.stops[liveData.stopIndex].departure_minutes);
     console.log(data.stops[liveData.stopIndex]);
 }
 //Šestajovice, Balkán
@@ -410,11 +428,11 @@ function shortenString(str){
     //console.log(str);
     let strLen = str.length+1;
     let splitStr = str.split(",");
-    if(splitStr.length == 1 && strLen > 11){
+    if(splitStr.length == 1 && strLen > 13){
         splitStr = str.split(" ");
     }
     //console.log(strLen);
-    if(strLen > 10){
+    if(strLen > 12){
         for (let i = 0; i < splitStr.length; i++) {
             let temp = splitStr[i].trim();
             //console.log("DELKA: "+ temp.length);
@@ -423,7 +441,7 @@ function shortenString(str){
                 //console.log("DELKA KRACENE: " + strLen);
                 strLen--;
                 //console.log(strLen);
-                if(strLen > 10){
+                if(strLen > 12){
                     temp = temp.slice(0,x) + ".";
                     
                 }
@@ -451,21 +469,30 @@ function hlaseniConstructor(node, mode){
     switch (mode) {
         case "curr":
             soundQueue.push(hlaseni.gong);    
-            transfers = getTransfers(node);        
+            transfers = getTransfers(node);     
+            soundQueue.push(node);  
         break;
         case "next":
-            soundQueue.push(hlaseni.pristiZastavka);            
+            soundQueue.push(hlaseni.pristiZastavka);  
+            soundQueue.push(node);          
         break;
     }
-    soundQueue.push(node);
+    
+
+
+    
     for (let i = 0; i < transfers.length; i++) {
         const element = transfers[i];
             if(hlaseni[element] != undefined){
                 soundQueue.push(hlaseni[element]);
             }
-        
-        
     }
+        if(liveData.stopIndex == data.stops.length-1 && mode == "curr"){
+            soundQueue.push(hlaseni.konecnaZastavka);
+            soundQueue.push(hlaseni.prosimeVystupte);
+            soundQueue.push(hlaseni.terminus);
+            soundQueue.push(hlaseni.pleaseLeave);
+        } 
     vyhlas();
 }
 
@@ -476,10 +503,18 @@ function vyhlas() {
     }
 
     playing = true;
-    
+
+
     announcement.src = "./HLASENI/" + soundQueue.shift() + ".ogg";
     announcement.play();
+
+
+
 }
+announcement.addEventListener("error", error => {
+    console.error(error);
+    vyhlas();
+})
 
 announcement.addEventListener("ended", vyhlas);
 
@@ -558,3 +593,13 @@ function compareTypes(str, num){
         return false;
     }
 }
+
+function minutesToTimeFormatted(mins){
+    if(mins >= 1440){
+        mins -= 1440;
+    }
+    let hour = String(Math.floor(mins / 60));
+    let minute = String(mins % 60);
+    return String(`${hour.padStart(2,"0")}:${minute.padStart(2,"0")}`);
+}
+
