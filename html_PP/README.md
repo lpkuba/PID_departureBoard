@@ -5,3 +5,5 @@ Aktuální funkcionalita:
 - Zadávání služby
 - Načtení dat o lince
 - Poslání dat serveru
+- Hlášení
+- Čas JŘ + Odchylka
