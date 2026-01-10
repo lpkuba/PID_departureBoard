@@ -276,27 +276,64 @@ ol {
     left: 152px;
     bottom: 0px;
 }
+
+#sipka0end{
+    position: absolute;
+    left: 152px;
+    bottom: 0px;
+}
+
 #sipka1 {
     position: absolute;
     left: 286px;
     top: 636px;
 }
+#sipka1end {
+    position: absolute;
+    left: 286px;
+    top: 675px;
+}
+
 #sipka2 {
     position: absolute;
     left: 304px;
     top: 526px;
 }
+#sipka2end {
+    position: absolute;
+    left: 304px;
+    top: 570px;
+}
+
 #sipka3 {
     position: absolute;
     left: 305px;
     top: 415px;
 }
+#sipka3end {
+    position: absolute;
+    left: 310px;
+    top: 460px;
+}
+
 #sipka4 {
     position: absolute;
     left: 289px;
     top: 306px;
 }
+#sipka4end {
+    position: absolute;
+    left: 300px;
+    top: 352px;
+}
+
 #sipka5 {
+    position: absolute;
+    left: 260px;
+    top: 200px;
+    z-index: 0;
+}
+#sipka5end {
     position: absolute;
     left: 260px;
     top: 200px;
@@ -363,6 +400,36 @@ ol {
     min-height: 48px;
 
 }    
+
+.departures .announcementContainer{
+    background-color: rgb(25 25 25);
+    height: 445px;
+    width: 1680px;
+    font-size: 72px;
+    font-weight: 600;
+    color: white;
+    display: flex;
+    padding: 20px 0 20px 0;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    position: relative;
+}
+
+.departures .announcementContainer[ hidden ]{
+    display: none;
+}
+.announcementContainer #announcementCZText{
+    font-size: 90px;
+    color: white;
+    font-weight: 600;
+}
+
+.announcementContainer #announcementENText{
+    font-size: 68px;
+    color: rgb(150 150 150);
+    font-weight: 300;
+}
 
 
 .departures #nextStopContainer{
