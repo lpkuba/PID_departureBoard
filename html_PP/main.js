@@ -1,6 +1,7 @@
 let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData, stops;
 let numpadEditing = false;
 let serverReady = false;
+let liveDataReady = false;
 let announcement = new Audio();
 let soundQueue = [];
 let playing = false;
@@ -8,7 +9,7 @@ let soundIndex = 0;
 announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
 const ppVersion = "0.0.5";
-
+let turnusData = {};
 data = {
     sluzbaFull: "912 51 01",
     slLinka: 912,
@@ -136,7 +137,7 @@ setInterval( function () {
         let odchylkaString = `${odchylka > 0 ? "+" : "-"}${String(Math.floor(Math.abs(odchylka)/60)).padStart(2,"0")}:${String(Math.abs(odchylka)%60).padStart(2,"0")}`
         document.getElementById("homeOdchylka").innerHTML = odchylkaString;
         document.getElementById("homeOdchylka").style.color = odchylka >= 0 ? "black" : "red";
-        if((JSON.stringify(liveData) != prevLiveData) && serverReady){
+        if((JSON.stringify(liveData) != prevLiveData) && liveDataReady){
             console.log("Odesílám rozdílný data");
             prevLiveData = JSON.stringify(liveData);
             sendLiveData(liveData);
@@ -193,7 +194,7 @@ function numpadHandler(key, loopback) {
             data.slPoradi = sluzbaShown.slice(4,6);
             data.slTypDne = sluzbaShown.slice(7,9);
             document.getElementById("popupSluzba").hidden = true;
-            loadRouteData();
+            loadRouteData(false);
             numpadEditing = false;
             numpadPos = 0;
         break;
@@ -331,35 +332,46 @@ function numpadHandler(key, loopback) {
     numpadHandler("refresh", sluzbaShown);
 }
 
-async function loadRouteData() {
+async function loadRouteData(loadNext) {
     liveData.stopIndex = 0;
-    let temp = {};
+    liveData.vehInStop = false;
+    //let temp = {};
     //data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
     try {
-        result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
-        temp = await result.json();
-        if(temp.dataStructureVersion !== ppVersion){
+        if(!loadNext){
+            result = await fetch(`../services/${data.slLinka}${data.slPoradi}${data.slTypDne}.json`);
+            dataSluzby = await result.json();
+        }
+        if(dataSluzby.dataStructureVersion !== ppVersion){
             alert("Nekompatibilní pořadí s touto verzí PP! Očekávej problémy.");
         }
         //console.log(temp);
         const nowMinutes = cas.h * 60 + cas.mi;
         let nearestTime = {time: 99999};
-        for (let i = 0; i < temp.trips.length; i++) {
-            //console.log("Forloop! " + i);
-            const element = temp.trips[i];
-            //console.log(element);
-            if((element.departure_minutes - nowMinutes) < nearestTime.time && (element.departure_minutes - nowMinutes) >= 0){
-                nearestTime.time = element.departure_minutes - nowMinutes;
-                nearestTime.index = i;
+        if(!loadNext){
+            for (let i = 0; i < dataSluzby.trips.length; i++) {
+                //console.log("Forloop! " + i);
+                const element = dataSluzby.trips[i];
+                //console.log(element);
+                if((element.departure_minutes - nowMinutes) < nearestTime.time && (element.departure_minutes - nowMinutes) >= 0){
+                    nearestTime.time = element.departure_minutes - nowMinutes;
+                    nearestTime.index = i;
+                }
+                else{
+                    nearestTime.time = element.departure_minutes - nowMinutes;
+                    nearestTime.index = 0;
+                }
             }
-            else{
-                nearestTime.time = element.departure_minutes - nowMinutes;
-                nearestTime.index = 0;
-            }
+            next = dataSluzby.trips[nearestTime.index];
+            data.slIndex = nearestTime.index;
         }
-        next = temp.trips[nearestTime.index];
+        else{
+            if(dataSluzby.trips.length-1 >= data.slIndex + 1){
+                data.slIndex++;
+            }
+            next = dataSluzby.trips[data.slIndex];
+        }
         //console.log(nearestTime);
-        data.slIndex = nearestTime.index;
         liveData.linkaActive = true;
         setTripData(next);
     } catch (error) {
@@ -372,6 +384,7 @@ async function loadRouteData() {
 
 
 function setTripData(trip){
+    liveData.vehInStop = false;
     data.sluzbaFull = `${trip.route.route_short_name.padStart(3, "0")} ${data.slPoradi.padStart(2, "0")} ${data.slTypDne.padStart(2, "0")}`;
     data.stops = trip.stop_times;
     data.cil = trip.trip_headsign;
@@ -386,43 +399,68 @@ function setTripData(trip){
 }
 
 function sendTripData(data){
-    socket.send(JSON.stringify({
-      "name": "pp",
-      "type": "ois",
-      "dataType": "routeData",
-      "data": data
-    }))
+    if(serverReady){
+        socket.send(JSON.stringify({
+          "name": "pp",
+          "type": "ois",
+          "dataType": "routeData",
+          "data": data
+        }))
+        setTimeout(() => {
+            liveDataReady = true;
+        }, 1000)
+    }
+    else{
+        console.error("Server není ve stavu ready!");
+    }
 }
 
 function sendLiveData(data){
-    socket.send(JSON.stringify({
-      "name": "pp",
-      "type": "ois",
-      "dataType": "liveData",
-      "data": data
-    }))
+    if(serverReady){
+        socket.send(JSON.stringify({
+          "name": "pp",
+          "type": "ois",
+          "dataType": "liveData",
+          "data": data
+        }))
+        }
+    else{
+        console.error("Server není ve stavu ready!");
+    }
 }
 
 function sendAnnouncementData(data){
-    socket.send(JSON.stringify({
-      "name": "pp",
-      "type": "ois",
-      "dataType": "annData",
-      "data": data
-    }))
+    if(serverReady){
+        setTimeout(() => {
+            socket.send(JSON.stringify({
+              "name": "pp",
+              "type": "ois",
+              "dataType": "annData",
+              "data": data
+            }))
+        }, 1500)
+        }
+    else{
+        console.error("Server není ve stavu ready!");
+    }
 }
 
 function announceStop() {
+    if(data.stops.length - 1 == liveData.stopIndex && liveData.vehInStop == true){
+        document.getElementById("homeStopName").style.backgroundColor ="white";
+        loadRouteData(true);
+        return;
+    }
     if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length-1){ //odjezd ze zast
         liveData.stopIndex++;
         liveData.vehInStop = false;
         updateTextFields();
-        document.getElementById("homeStopName").classList.remove("active");
+        document.getElementById("homeStopName").style.backgroundColor ="white";
         hlaseniConstructor(data.stops[liveData.stopIndex].stop.properties.stop_id.split("Z")[0].slice(1), "next");
     }
     else{ //příjezd do zast
         liveData.vehInStop = true;
-        document.getElementById("homeStopName").classList.add("active");
+        document.getElementById("homeStopName").style.backgroundColor ="yellow";
         hlaseniConstructor(data.stops[liveData.stopIndex].stop.properties.stop_id.split("Z")[0].slice(1), "curr");
 
     }
