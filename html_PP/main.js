@@ -403,6 +403,15 @@ function sendLiveData(data){
     }))
 }
 
+function sendAnnouncementData(data){
+    socket.send(JSON.stringify({
+      "name": "pp",
+      "type": "ois",
+      "dataType": "annData",
+      "data": data
+    }))
+}
+
 function announceStop() {
     if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length-1){ //odjezd ze zast
         liveData.stopIndex++;
@@ -524,6 +533,7 @@ function hlaseniConstructor(node, mode){
             soundQueue.push(hlaseni.prosimeVystupte);
             soundQueue.push(hlaseni.terminus);
             soundQueue.push(hlaseni.pleaseLeave);
+            sendAnnouncementData(hlaseniDefinice.konecnaZastavka);
         } 
     vyhlas();
 }

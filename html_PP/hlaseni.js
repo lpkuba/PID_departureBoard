@@ -40,3 +40,17 @@ const hlaseni = {
     terminus: "H613",
     pleaseLeave: "H614"
 }
+
+const hlaseniDefinice = {
+    konecnaZastavka: {
+        timeout: 0,
+        cz: {
+            text: "Konečná zastávka, prosíme vystupte.",
+            size: "90px"
+        },
+        en: {
+            text: "Final stop, please leave the bus.",
+            size: "68px"
+        }
+    }
+}
