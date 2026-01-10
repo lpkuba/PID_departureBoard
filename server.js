@@ -27,24 +27,22 @@ wss.on('connection', ws => {
             return;
         }
         prevWsData = string;
-        //console.log(wsData);
+        //console.log(wsData) ;
         
         let sendData = "";
         if(ws.name == "pp"){
             console.log("Příchozí zpráva z PPčka!");
             if(wsData.dataType == "routeData"){
-                //console.log("Před asyncem");
-                //console.log(wsData.data.trip_id);
-                (async () => {
-                    //console.log("V asyncu");
-                    wsData.data = await setBustecTrip(wsData.data.trip_id);
-                    wsData.dataType = "routeData";
-                    let bustecClients = clients.filter((client) => client.name == "bustec");
-                    for (let i = 0; i < bustecClients.length; i++) {
-                        const element = bustecClients[i];
-                        element.send(JSON.stringify(wsData));
-                    }
-                })();
+                        let message = {};
+                        setBustecTrip(wsData.data.trip_id).then(returnedData => {
+                        message.data = returnedData;
+                        message.dataType = "routeData";
+                            let bustecClients = clients.filter((client) => client.name == "bustec");
+                            for (let i = 0; i < bustecClients.length; i++) {
+                                const element = bustecClients[i];
+                                element.send(JSON.stringify(message));
+                            }
+                    });
             }
             else{
                 let bustecClients = clients.filter((client) => client.name == "bustec");
@@ -125,8 +123,6 @@ async function setBustecTrip(tripId) {
         reject(err);
         return;
     }
-
-    //zde dodělat aktuální pozici podle času
     //console.log(tripInfo);
     let trip = {
         type: "",
