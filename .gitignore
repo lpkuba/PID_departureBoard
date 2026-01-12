@@ -1,7 +1,6 @@
 options.json
 /res
 /src/icons
-/bustec
 /node_modules
 package-lock.json
 package.json
