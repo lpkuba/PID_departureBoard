@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odjezdová Tabule</title>
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
+    <script src="./bustec.js"></script>
+    <link rel="stylesheet" href="../main.css">
+    <link rel="stylesheet" href="../routeColors.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body onload="init()">
+    <div class="departures regbus" id="mainDiv">
+        <span class="line regbus" id="line">303</span>
+        <div class="destination"><img height="50px" src="../src/icons/arrow.svg"> <span id="destination">Koloděje  </span></div>
+        <div class="timeZoneDiv">
+            <span class="time" id="time">16:24</span>
+            <span class="pres">Přes:</span>
+            <span class="via">Via:</span>
+        </div>
+        <div class="viaStops">
+            <div class="roller">
+                <span>Sychrov</span>
+                <span>–</span>
+                <span>Šestajovice, Balkán</span>
+                <span>–</span>
+                <span>Nádraží Klánovice <img height="60px" src="../src/icons/train.svg"></span>
+                <span>–</span>
+                <span>Pošta Újezd nad Lesy</span>
+            </div>
+        </div>
+        <div class="upcomingStopsContainer" id="upcomingStopsMain" >
+        <img src="../src/icons/diversion.svg" id="diversion" height="485px">
+          <img src="../src/icons/arrows/top.svg" id="sipka5" height="112px" data-group="stopMarkers">
+            <div class="zone4"><span id="zone4">B,1</span></div><img src="../src/icons/arrows/4.svg" id="sipka4" height="112px" data-group="stopMarkers"><img src="../src/icons/arrows/4_end.svg" id="sipka4end" height="64px" data-group="stopMarkers" hidden><div class="stop4"><span id="stop4">Šestajovice, Pražská</span></div>
+            <div class="zone3"><span id="zone3">B,1</span></div><img src="../src/icons/arrows/3.svg" id="sipka3" height="112px" data-group="stopMarkers"><img src="../src/icons/arrows/3_end.svg" id="sipka3end" height="64px" data-group="stopMarkers" hidden><div class="stop3"><span id="stop3">Šestajovice, Balkán</span></div>
+            <div class="zone2"><span id="zone2">B,1</span></div><img src="../src/icons/arrows/2.svg" id="sipka2" height="112px" data-group="stopMarkers"><img src="../src/icons/arrows/2_end.svg" id="sipka2end" height="68px" data-group="stopMarkers" hidden><div class="stop2"><span id="stop2">Šestajovice, Za Stodolami</span></div>
+            <div class="zone1"><span id="zone1">B,1</span></div><img src="../src/icons/arrows/1.svg" id="sipka1" height="112px" data-group="stopMarkers"><img src="../src/icons/arrows/1_end.svg" id="sipka1end" height="72px" data-group="stopMarkers" hidden><div class="stop1">  <span id="stop1">Sychrov</span></div>
+        </div>
+        <div class="upcomingStopsContainer" id="upcomingStopsInfoPane" hidden>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line train">S1</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Praha, Masarykovo nádr.</span><span class="platform">2/6</span><span class="time"><b>5</b> min.</span></div>
+            <div><span class="line train">S61</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Úvaly</span><span class="platform">3/6</span><span class="time"><b>6</b> min.</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div><span class="line bus">123</span><img height="25px" src="../src/icons/arrow.svg" class="arrow"><span class="destination">Šmukýřka</span></div>
+            <div class="noMoreDeps">– Žádné další odjezdy v následujících 30 min. –</div>
+        </div>
+        <div class="announcementContainer" id="announcementContainer">
+            <span id="announcementCZText">Konečná zastávka, prosíme vystupte.</span>
+            <span id="announcementENText">Final stop, please leave the bus.</span>
+
+        </div>
+        <div id="nextStopContainer">
+            <div class="zone0"><span id="zone0">B</span></div>
+            <img src="../src/icons/arrows/0.svg" id="sipka0" height="290px" width="200px" data-group="stopMarkers">
+            <img src="../src/icons/arrows/0_end.svg" id="sipka0end" height="180px" width="200px" data-group="stopMarkers" hidden>
+            <div class="header">
+                <span id="nextStopHelperCZ">Příští zastávka </span><span id="nextStopHelperEN">&nbsp;/ Next stop</span>
+            </div>
+            <div class="content" id="nextStopContent">
+                <span class="zoneHelperCZ">Tarifní pásmo</span>
+                <span class="zoneHelperEN">Fare zone</span>
+                <span class="nextStopName" id="stop0">Na Kovárně</span>
+                <div class="transfers" id="transfers" hidden>
+                    <div style="text-align: right;">                
+                        <span id="transfersHelperCZ">Přestup</span><br>
+                        <span id="transfersHelperEN">Transfer</span>
+                    </div>
+                    <div id="transferTypes">
+                        <img src="../src/icons/metroC.svg" height="75px">
+                        <img src="../src/icons/metroB.svg" height="75px">
+                        <img src="../src/icons/metroA.svg" height="75px">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="setup2" id="setup2">
+        <label for="serverIP">IPv4 adresa serveru:</label><input type="text" id="serverIP" placeholder="adresa serveru">
+        <button onclick="connect()">Připojit!</button><button onclick="updateData()">Stáhni data!</button><br><span id="result"></span><br>
+        <button onclick='posunZastavky("+")'>Posun +</button><button onclick='posunZastavky("-")'>Posun -</button><br>
+        <label for="zastavkaBtn">V zastávce?:</label><input type="checkbox" id="zastavkaBtn" onchange="vehicleInStop()">
+        <span id="indexZastavky"></span>
+    </div>
+</body>
+</html>
