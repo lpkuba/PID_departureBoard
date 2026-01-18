@@ -7,6 +7,9 @@ const getDirectories = source =>
     .map(dirent => dirent.name);
 
 getDirectories("./").forEach(folder => {
+    if(folder.startsWith("_")){
+        return;
+    }
     console.log(folder);
     fs.readdir(folder, (err, files) => {
         console.log(files);

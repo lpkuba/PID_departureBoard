@@ -1,2 +1,4 @@
 # GTFS Parser
 Do této složky přijdou data ve formátu GTFS, script csvToJSON.js si všechny složky vyhmátne sám a následně vytvoří "slozka_JSON" s převedenými CSV na JSON a pár upravených pro ušetření paměti
+
+Ignoruje složky začínající podtržítkem, pro jednodušší archivaci starších GTFS dat
