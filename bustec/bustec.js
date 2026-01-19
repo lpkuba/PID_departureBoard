@@ -339,23 +339,16 @@ async function getNextStopDepartures(id) {
 
     for (let i = 0; i < 12; i++) {
         //console.log(departures[i]);
-
+        const dep = departures[i];
+        //console.log(dep);
         if(departures[i] == undefined){
             if(noMoreDeparturesTextAdded){
                 toAdd += `<div></div>`;
-                
             }
             else{
                 noMoreDeparturesTextAdded = true;
                 toAdd += `<div class="noMoreDeps">– Žádné další odjezdy v následujících 30 min. –</div>`;
             }
-            continue;
-        }
-        const dep = departures[i];
-        //console.log(dep);
-        if(data.line == dep.route.short_name){
-            departures.splice(i, 1);
-            i--;
             continue;
         }
 
@@ -370,9 +363,18 @@ async function getNextStopDepartures(id) {
             }
             continue;
         }
+
+        if(data.line == dep.route.short_name){
+            departures.splice(i, 1);
+            i--;
+            continue;
+        }
         else{
             let linka = dep.route.short_name;
             let smer = dep.trip.headsign;
+            if((data.stops[stopIndex].zone == "P" || data.stops[stopIndex].zone == "0" || data.stops[stopIndex].zone == "B") && smer.startsWith("Praha")){
+                smer = smer.slice(6);
+            }
             let nastupiste = dep.stop.platform_code;
             let typ = "";
             if(dep.route.is_night){
