@@ -208,7 +208,6 @@ function popupBtnFunc(event) {
                 }
             break;
             case "yes":
-                alert("Zastávka ID: " + polohaStopIndex + "...Služba ID: " + polohaSluzbaIndex );
                 liveData.stopIndex = polohaStopIndex;
                 if(data.slIndex != polohaSluzbaIndex){
                     data.slIndex = polohaSluzbaIndex;
