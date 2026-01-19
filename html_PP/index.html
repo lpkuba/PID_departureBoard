@@ -107,7 +107,7 @@
                 <div class="button">KL+HO</div>
                 <div class="button"><img src="./icons/Vysilacka64.png" width="64px" height="64px"></div>
                 <div class="button"><img src="./icons/Budik64.png" width="64px" height="64px"></div>
-                <div class="button">Poloha</div>
+                <div class="button" id="poloha">Poloha</div>
             </div>
             <div class="row">
                 <div class="button">ŘE</div>
@@ -158,7 +158,36 @@
                 </div>
                 <div class="button" id="popupCilOK" onclick="this.parentElement.parentElement.hidden = true">OK</div>
             </div>
-
+        </div>
+        <div class="popup poloha" id="popupPoloha" hidden>
+            <div class="popisek">Poloha</div>
+            <div class="radek">
+                <div class="textFieldHelper">Název zastávky</div>
+                <div class="textField" id="polohaStop">Kablo</div>
+            </div>
+            <div class="radek">
+                <div class="textFieldHelper">Čas odjezdu</div>
+                <div class="textField" id="polohaTime">21:39</div>
+            </div>
+            <div class="buttons" id="polohaButtons">
+                <div class="row">
+                    <div class="filler"></div>
+                    <div class="button clickableBtnGlobal" id="polohaUp"><img src="./icons/Sipka_U64.png" width="64px" height="64px"></div>
+                    <div class="filler"></div>
+                </div>
+                <div class="row">
+                    <div class="button" id="polohaLeft"><img src="./icons/Sipka_L64.png" width="64px" height="64px"></div>
+                    <div class="filler clickableBtnGlobal"></div>
+                    <div class="button" id="polohaRight"><img src="./icons/Sipka_R64.png" width="64px" height="64px"></div>
+                </div>
+                <div class="row">
+                    <div class="button clickableBtnGlobal" id="polohaYes"><img src="./icons/Potvrd64.png" width="64px" height="64px"></div>
+                    <div class="button clickableBtnGlobal" id="polohaDown"><img src="./icons/Sipka_D64.png" width="64px" height="64px"></div>
+                    <div class="button clickableBtnGlobal" id="polohaNo"><img src="./icons/Zrus64.png" width="64px" height="64px"></div>
+                
+                </div>
+            
+            </div>
         </div>
     </div>
     

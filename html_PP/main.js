@@ -1,4 +1,4 @@
-let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData, stops;
+let connectionInterval, data, liveData, ipAddr, casovac, cas = {}, numpadPos=0, liveDataInterval, prevLiveData, stops, polohaStopIndex, polohaSluzbaIndex;
 let numpadEditing = false;
 let serverReady = false;
 let liveDataReady = false;
@@ -8,7 +8,7 @@ let playing = false;
 let soundIndex = 0;
 announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
-const ppVersion = "0.0.5";
+const ppVersion = "0.0.5"; //verze se mění pouze při změně formátu dat
 let turnusData = {};
 data = {
     sluzbaFull: "912 51 01",
@@ -60,9 +60,12 @@ async function init(){
             child.addEventListener("click", popupVisFunc, false);
         });
     });
-
-    
     Array.from(document.getElementById("numpadMain").children).forEach(nigga => {
+        Array.from(nigga.children).forEach(child => {
+            child.addEventListener("click", popupBtnFunc, false);
+        });
+    });
+    Array.from(document.getElementById("polohaButtons").children).forEach(nigga => {
         Array.from(nigga.children).forEach(child => {
             child.addEventListener("click", popupBtnFunc, false);
         });
@@ -70,6 +73,7 @@ async function init(){
     document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
     document.getElementById("popupCilOK").addEventListener("click", popupBtnFunc, false);
     document.getElementById("homeSluzba").addEventListener("click", () => {hlaseniConstructor(null, "line");});
+
 
     
     const response = await fetch("../src/stops.json");
@@ -101,6 +105,15 @@ function popupVisFunc(event) {
         break;
         case "vyhlasitZastavku":
             announceStop();
+        break;
+        case "poloha":
+            if(liveData.linkaActive){
+                document.getElementById("popupPoloha").hidden = false;
+                polohaSluzbaIndex = data.slIndex;
+                polohaStopIndex = liveData.stopIndex;
+                document.getElementById("polohaStop").innerHTML = dataSluzby.trips[polohaSluzbaIndex].stop_times[polohaStopIndex].stop.properties.stop_name;
+                document.getElementById("polohaTime").innerHTML = minutesToTimeFormatted(dataSluzby.trips[polohaSluzbaIndex].stop_times[polohaStopIndex].departure_minutes);
+            }
         break;
             
     }
@@ -154,8 +167,72 @@ function popupBtnFunc(event) {
     if(this.id.startsWith("numpad")){
         numpadHandler(this.id,"");
     }
-    else if(this.id == "popupCilOK"){
-        document.getElementById("popupCil_known").hidden = true;
+    if(this.id.startsWith("poloha")){
+            console.log(this.id.toLowerCase().slice(6));
+
+        switch (this.id.toLowerCase().slice(6)){
+            //nahoru je jakejsi skip na konec, či další spoj
+            case "up":
+                //když ještě máme nějaký spoje
+                if (polohaSluzbaIndex < dataSluzby.trips.length-1) {
+                    //když je poslední zastávka danýho spoje
+                    if(dataSluzby.trips[polohaSluzbaIndex].stop_times.length-1 == polohaStopIndex){
+                        polohaSluzbaIndex++;
+                    }
+                    polohaStopIndex = dataSluzby.trips[polohaSluzbaIndex].stop_times.length-1;                   
+                }                
+            break;
+            //dolu dělá to stejný co nahoru akorát že neřeší aktuální pozici 
+            case "down":
+                if(polohaSluzbaIndex > 0){
+                    polohaSluzbaIndex--;
+                    polohaStopIndex = dataSluzby.trips[polohaSluzbaIndex].stop_times.length-1;                   
+                }
+            break;
+            case "left":
+                if(polohaStopIndex > 0){
+                    polohaStopIndex--;
+                }
+                else if(polohaSluzbaIndex > 0){
+                    polohaSluzbaIndex--;
+                    polohaStopIndex = dataSluzby.trips[polohaSluzbaIndex].stop_times.length-1;
+                }
+            break;
+            case "right":
+                if(polohaStopIndex < dataSluzby.trips[polohaSluzbaIndex].stop_times.length-1){
+                    polohaStopIndex++;
+                }
+                else if(polohaSluzbaIndex < dataSluzby.trips.length-1){
+                    polohaSluzbaIndex++;
+                    polohaStopIndex = 0;
+                }
+            break;
+            case "yes":
+                alert("Zastávka ID: " + polohaStopIndex + "...Služba ID: " + polohaSluzbaIndex );
+                liveData.stopIndex = polohaStopIndex;
+                if(data.slIndex != polohaSluzbaIndex){
+                    data.slIndex = polohaSluzbaIndex;
+                    loadRouteData(true,true);
+                }
+                else{
+                    liveData.vehInStop = false;
+                    document.getElementById("homeStopName").style.backgroundColor ="white";
+                    updateTextFields();
+                }
+            case "no":  
+                document.getElementById("popupPoloha").hidden = true;
+            break;
+        }
+        //let lastStopIndex = dataSluzby.trips[data.slIndex].stop_times.length-1;
+        document.getElementById("polohaStop").innerHTML = dataSluzby.trips[polohaSluzbaIndex].stop_times[polohaStopIndex].stop.properties.stop_name;
+        document.getElementById("polohaTime").innerHTML = minutesToTimeFormatted(dataSluzby.trips[polohaSluzbaIndex].stop_times[polohaStopIndex].departure_minutes);
+    }
+
+
+    switch (this.id) {
+        case "popupCilOK":
+            document.getElementById("popupCil_known").hidden = true;
+        break;
     }
 
 }
@@ -194,7 +271,7 @@ function numpadHandler(key, loopback) {
             data.slPoradi = sluzbaShown.slice(4,6);
             data.slTypDne = sluzbaShown.slice(7,9);
             document.getElementById("popupSluzba").hidden = true;
-            loadRouteData(false);
+            loadRouteData(false,false);
             numpadEditing = false;
             numpadPos = 0;
         break;
@@ -332,9 +409,12 @@ function numpadHandler(key, loopback) {
     numpadHandler("refresh", sluzbaShown);
 }
 
-async function loadRouteData(loadNext) {
-    liveData.stopIndex = 0;
+async function loadRouteData(loadNext, loadByPoloha) {
+    if(!loadByPoloha){
+        liveData.stopIndex = 0; 
+    }
     liveData.vehInStop = false;
+    document.getElementById("homeStopName").style.backgroundColor ="white";
     //let temp = {};
     //data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
     try {
@@ -366,7 +446,7 @@ async function loadRouteData(loadNext) {
             data.slIndex = nearestTime.index;
         }
         else{
-            if(dataSluzby.trips.length-1 >= data.slIndex + 1){
+            if(dataSluzby.trips.length-1 >= data.slIndex + 1 && !loadByPoloha){
                 data.slIndex++;
             }
             next = dataSluzby.trips[data.slIndex];
@@ -376,6 +456,7 @@ async function loadRouteData(loadNext) {
         setTripData(next);
     } catch (error) {
         data.sluzbaFull = `${data.slLinka.toString().padStart(3, "0")} ${data.slPoradi.toString().padStart(2, "0")} ${data.slTypDne.toString().padStart(2, "0")}`;
+        document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
         liveData.linkaActive = false;
         console.error(error);
         updateTextFields("erase");
@@ -385,14 +466,14 @@ async function loadRouteData(loadNext) {
 
 function setTripData(trip){
     liveData.vehInStop = false;
-    data.sluzbaFull = `${trip.route.route_short_name.padStart(3, "0")} ${data.slPoradi.padStart(2, "0")} ${data.slTypDne.padStart(2, "0")}`;
+    data.sluzbaFull = `${isNaN(Number(trip.route.route_short_name)) ? data.slLinka.toString().padStart(3, "0") : String(trip.route.route_short_name).padStart(3, "0")} ${data.slPoradi.padStart(2, "0")} ${data.slTypDne.padStart(2, "0")}`;
     data.stops = trip.stop_times;
     data.cil = trip.trip_headsign;
     data.gtfsTripId = trip.trip_id;
     data.typVozidla = trip.route.route_type;
     //Update textfield
 
-    document.getElementById("cilText").innerHTML = data.cil;
+    document.getElementById("cilText").innerHTML = shortenString(data.cil, 18);
     updateTextFields();
     sendTripData(trip);
 
@@ -448,7 +529,7 @@ function sendAnnouncementData(data){
 function announceStop() {
     if(data.stops.length - 1 == liveData.stopIndex && liveData.vehInStop == true){
         document.getElementById("homeStopName").style.backgroundColor ="white";
-        loadRouteData(true);
+        loadRouteData(true,false);
         return;
     }
     if(liveData.vehInStop == true && liveData.stopIndex < data.stops.length-1){ //odjezd ze zast
@@ -468,7 +549,7 @@ function announceStop() {
 
 function updateTextFields(mode) {
     if(mode == undefined){
-        document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name);
+        document.getElementById("homeJmenoZast").innerHTML = shortenString(data.stops[liveData.stopIndex].stop.properties.stop_name, 13);
         document.getElementById("homePasmo").innerHTML = data.stops[liveData.stopIndex].stop.properties.zone_id;
         document.getElementById("homeCasJR").innerHTML = minutesToTimeFormatted(data.stops[liveData.stopIndex].departure_minutes);
         document.getElementById("homeSluzba").innerHTML = data.sluzbaFull;
@@ -481,16 +562,16 @@ function updateTextFields(mode) {
     }
 }
 //Šestajovice, Balkán
-function shortenString(str){
+function shortenString(str,maxLen){
     //const str = "ABCDEFGH, IJKLMNOP";
     //console.log(str);
     let strLen = str.length+1;
     let splitStr = str.split(",");
-    if(splitStr.length == 1 && strLen > 13){
+    if(splitStr.length == 1 && strLen > maxLen){
         splitStr = str.split(" ");
     }
     //console.log(strLen);
-    if(strLen > 12){
+    if(strLen > maxLen-1){
         for (let i = 0; i < splitStr.length; i++) {
             let temp = splitStr[i].trim();
             //console.log("DELKA: "+ temp.length);
@@ -538,16 +619,32 @@ function hlaseniConstructor(node, mode){
             soundQueue.push(hlaseni.gong);
             soundQueue.push(hlaseni.linka);
             let temp = data.sluzbaFull.split(" ");
-            let dvojcislovka = Number(temp[0].slice(1));
-            if(dvojcislovka > 10 && dvojcislovka < 20){
-                soundQueue.push(`C${temp[0][0]}00`);
-                soundQueue.push(`C${dvojcislovka}`);
+            console.log(temp[0]);
+            switch (temp[0]) {
+                case "834":
+                    soundQueue.push(hlaseni.xA);
+                break;
+                case "835":
+                    soundQueue.push(hlaseni.xB);
+                break;
+                case "836":
+                    soundQueue.push(hlaseni.xC);
+                break;
+
+                default:
+                    let dvojcislovka = Number(temp[0].slice(1));
+                    if(dvojcislovka > 10 && dvojcislovka < 20){
+                        soundQueue.push(`C${temp[0][0]}00`);
+                        soundQueue.push(`C${dvojcislovka}`);
+                    }
+                    else{
+                        soundQueue.push(`C${temp[0][0]}00`);
+                        soundQueue.push(`C${temp[0][1]}0`);
+                        soundQueue.push(`C${temp[0][2]}`);
+                    }
+                break;
             }
-            else{
-                soundQueue.push(`C${temp[0][0]}00`);
-                soundQueue.push(`C${temp[0][1]}0`);
-                soundQueue.push(`C${temp[0][2]}`);
-            }
+
             soundQueue.push(hlaseni.smer);
             try {
                 soundQueue.push(data.stops[data.stops.length-1].stop_id.split("Z")[0].slice(1));
@@ -675,6 +772,7 @@ function compareTypes(str, num){
 }
 
 function minutesToTimeFormatted(mins){
+    console.log("Minuty: " + mins);
     if(mins >= 1440){
         mins -= 1440;
     }
