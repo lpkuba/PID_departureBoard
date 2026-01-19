@@ -117,13 +117,16 @@ async function setBustecTrip(tripId) {
     let tripInfo = {};
     try {
         const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
-        tripInfo = await response.json();        
+        tripInfo = await response.json();
+        if(tripInfo.error_status == 404){
+            throw err;
+        }    
     } catch (err) {
         console.error(err);
         reject(err);
         return;
     }
-    //console.log(tripInfo);
+    console.log(tripInfo);
     let trip = {
         type: "",
         typeId: 0,
@@ -132,7 +135,6 @@ async function setBustecTrip(tripId) {
         id: "",
         stops: []
     };
-    
         if(tripInfo.route.is_night){
             trip.type += "night ";
         }
