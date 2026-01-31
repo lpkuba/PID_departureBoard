@@ -34,21 +34,20 @@ wss.on('connection', ws => {
             console.log("Příchozí zpráva z PPčka!");
             if(wsData.dataType == "routeData"){
                         let message = {};
+                        console.log(wsData.data.trip_id);
                         if(wsData.data.trip_id != undefined){
                             setBustecTrip(wsData.data.trip_id).then(returnedData => {
                             message.data = returnedData;
                             message.dataType = "routeData";
+                                sendToBustec(message);
                             });
                         }
                         else{
                             message.data = wsData.data;
                             message.dataType = "unknwRouteData";
+                                sendToBustec(message);
                         }
-                        let bustecClients = clients.filter((client) => client.name == "bustec");
-                        for (let i = 0; i < bustecClients.length; i++) {
-                            const element = bustecClients[i];
-                            element.send(JSON.stringify(message));
-                        }
+
             }
             else{
                 let bustecClients = clients.filter((client) => client.name == "bustec");
@@ -264,5 +263,13 @@ function compareTypes(str, num){
     }
     else{
         return false;
+    }
+}
+
+function sendToBustec(message){
+    let bustecClients = clients.filter((client) => client.name == "bustec");
+    for (let i = 0; i < bustecClients.length; i++) {
+        const element = bustecClients[i];
+        element.send(JSON.stringify(message));
     }
 }
