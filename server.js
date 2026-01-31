@@ -34,15 +34,21 @@ wss.on('connection', ws => {
             console.log("Příchozí zpráva z PPčka!");
             if(wsData.dataType == "routeData"){
                         let message = {};
-                        setBustecTrip(wsData.data.trip_id).then(returnedData => {
-                        message.data = returnedData;
-                        message.dataType = "routeData";
-                            let bustecClients = clients.filter((client) => client.name == "bustec");
-                            for (let i = 0; i < bustecClients.length; i++) {
-                                const element = bustecClients[i];
-                                element.send(JSON.stringify(message));
-                            }
-                    });
+                        if(wsData.data.trip_id != undefined){
+                            setBustecTrip(wsData.data.trip_id).then(returnedData => {
+                            message.data = returnedData;
+                            message.dataType = "routeData";
+                            });
+                        }
+                        else{
+                            message.data = wsData.data;
+                            message.dataType = "unknwRouteData";
+                        }
+                        let bustecClients = clients.filter((client) => client.name == "bustec");
+                        for (let i = 0; i < bustecClients.length; i++) {
+                            const element = bustecClients[i];
+                            element.send(JSON.stringify(message));
+                        }
             }
             else{
                 let bustecClients = clients.filter((client) => client.name == "bustec");
@@ -72,6 +78,7 @@ wss.on('connection', ws => {
 
 const fetchOpt = require("./options.json");
 const stops = require("./src/stops.json");
+const { error } = require("console");
 const fuse = new Fuse(stops.stopGroups,{
         keys: [{name:'uniqueName', weight: 3}, {name:'stops.altIdosName', weight: 1}],
         threshold: 0.3,
@@ -89,7 +96,19 @@ app.post("/bustec", (req, res) => {
     //console.log("tohle má být IDčko");
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.json({ ok: true });
-    setBustecTrip(req.body.idTrip);
+    if(req.body.idTrip != undefined){
+        setBustecTrip(req.body.idTrip);
+    }
+    else{
+        let trip = {
+            type: "",
+            typeId: 0,
+            line: "",
+            dest: "",
+            id: "",
+            stops: []
+        };
+    }
 })
 
 app.get("/status", (req, res) =>{
@@ -119,14 +138,13 @@ async function setBustecTrip(tripId) {
         const response = await fetch(`https://api.golemio.cz/v2/gtfs/trips/${tripId}?includeShapes=false&includeStops=true&includeStopTimes=true&includeService=false&includeRoute=true`, fetchOpt);
         tripInfo = await response.json();
         if(tripInfo.error_status == 404){
-            throw err;
+            throw new Error("Neplatný GTFS");
         }    
-    } catch (err) {
-        console.error(err);
-        reject(err);
+    } catch (error) {
+        console.log(error);
+        reject("err");
         return;
     }
-    console.log(tripInfo);
     let trip = {
         type: "",
         typeId: 0,
