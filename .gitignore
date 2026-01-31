@@ -4,7 +4,6 @@ options.json
 /node_modules
 package-lock.json
 package.json
-mapa.html
 run.bat
 /routeData
 /gtfs/*/
@@ -12,5 +11,7 @@ run.bat
 /html_PP/icons/*
 /html_PP/main *
 /services/*
-/html_PP/HLASENI
+/html_PP/HLAS*
+/html_PP/zastavk*
 _*
+/mapa/
