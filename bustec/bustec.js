@@ -1,4 +1,4 @@
-let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop, wsData, announcement = false, announcementTimeout;
+let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop, wsData, announcement = false, announcementTimeout, linkaActive = false;
 let connectionReady = false;
 
 const socket = new WebSocket("ws://192.168.2.67:3001");
@@ -26,12 +26,13 @@ socket.addEventListener("message", (msg) => {
             document.getElementById("announcementContainer").hidden = true;
         }
 
-        updateData(wsData.data);
+        updateData(wsData.data, false);
         console.log(wsData);
 
     }
     else if(wsData.dataType == "liveData"){
         stopIndex = wsData.data.stopIndex;
+        linkaActive = wsData.data.linkaActive;
         vehicleInStop(wsData.data.vehInStop);
         updateTextFields();
     }
@@ -48,6 +49,9 @@ socket.addEventListener("message", (msg) => {
         document.getElementById("announcementCZText").style.fontSize = wsData.data.cz.size;
         document.getElementById("announcementENText").innerHTML = wsData.data.en.text;
         document.getElementById("announcementENText").style.fontSize = wsData.data.en.size;
+    }
+    else if(wsData.dataType == "unknwRouteData"){
+        updateData(wsData.data, true);
     }
 });
 
@@ -86,7 +90,7 @@ async function connect(){
     }
 }
 
-async function updateData(inputData) {
+async function updateData(inputData, mode) {
     if(inputData == undefined){
         const res = await fetch(`http://${ipAddr}:3000/bustec`, {method: "GET"});
         data = await res.json(); 
@@ -96,7 +100,7 @@ async function updateData(inputData) {
     }
     console.log(data);
     stopIndex = 0;
-    updateTextFields();
+    updateTextFields(mode);
 }
 
 function hodiny(){
@@ -108,7 +112,7 @@ function hodiny(){
     //console.log((casovac - ted) / 1000 );
     //console.log("Update hodin ted!");
     if((((ted - casovac) / 1000) > 10)){
-        if(!(vehInStop || announcement)){
+        if(!(vehInStop || announcement) && linkaActive){
             console.log("Snaha o přepnutí:");
             for (const element of document.getElementsByClassName("upcomingStopsContainer")) {
                 element.hidden = !element.hidden;
@@ -147,7 +151,7 @@ function posunZastavky(smer){
     
 }
 
-function updateTextFields(){
+function updateTextFields(mode){
     document.getElementById("indexZastavky").innerHTML = "Index zastávky: " + stopIndex;
     document.getElementById("line").innerHTML = data.line;
     document.getElementById("line").className = "line " + data.type;
@@ -159,13 +163,16 @@ function updateTextFields(){
     }
     document.getElementById("mainDiv").className = "departures " + data.type;
     document.getElementById("destination").innerHTML = data.dest;
+    
     let cilTransfers = "";
-    data.stops[data.stops.length-1].transfers.forEach(transfer => {
-        if(transfer != "tram" && transfer != "bus" && transfer != "trolleybus" && !(data.type.startsWith("night"))){
-                cilTransfers += `<img src="../src/icons/${transfer}.svg" height="74px">`;
-        }}
-    );
-    document.getElementById("destination").innerHTML += cilTransfers;
+    if(!mode){
+        data.stops[data.stops.length-1].transfers.forEach(transfer => {
+            if(transfer != "tram" && transfer != "bus" && transfer != "trolleybus" && !(data.type.startsWith("night"))){
+                    cilTransfers += `<img src="../src/icons/${transfer}.svg" height="74px">`;
+            }}
+        );
+        document.getElementById("destination").innerHTML += cilTransfers;
+    }
 
     if(!(data.stops[stopIndex+4] == undefined)){
         document.getElementById("zone4").innerHTML = data.stops[stopIndex+4].zone;
@@ -230,24 +237,30 @@ function updateTextFields(){
         document.getElementById("zone1").innerHTML = "  ";
         document.getElementById("stop1").innerHTML = "  ";
     }
-    document.getElementById("zone0").innerHTML = data.stops[stopIndex].zone;
-    document.getElementById("stop0").innerHTML = data.stops[stopIndex].name;
-    console.log(data.stops[stopIndex].transfers);
-    if(data.stops[stopIndex].transfers.length > 0 && !data.type.startsWith("night") ){
-        let transfers = "";
-        data.stops[stopIndex].transfers.forEach(transfer => {
-            if(transfer != "tram" && transfer != "bus" && transfer != "trolleybus" && !(data.type.startsWith("night"))){
-                    transfers += `<img src="../src/icons/${transfer}.svg" height="75px"> `;
-            }}
-        );
-        document.getElementById("transferTypes").innerHTML = transfers;
-        document.getElementById("transfers").hidden = false;
-        console.log("máme přestupy");
+    if(!(data.stops[stopIndex] == undefined)){
+        document.getElementById("zone0").innerHTML = data.stops[stopIndex].zone;
+        document.getElementById("stop0").innerHTML = data.stops[stopIndex].name;
+        if(data.stops[stopIndex].transfers.length > 0 && !data.type.startsWith("night") && !mode){
+            let transfers = "";
+            data.stops[stopIndex].transfers.forEach(transfer => {
+                if(transfer != "tram" && transfer != "bus" && transfer != "trolleybus" && !(data.type.startsWith("night"))){
+                        transfers += `<img src="../src/icons/${transfer}.svg" height="75px"> `;
+                }}
+            );
+            document.getElementById("transferTypes").innerHTML = transfers;
+            document.getElementById("transfers").hidden = false;
+            console.log("máme přestupy");
+        }
+        else{
+            document.getElementById("transfers").hidden = true;
+            console.log("nemáme přestupy");
+        }
     }
     else{
-        document.getElementById("transfers").hidden = true;
-        console.log("nemáme přestupy");
+        document.getElementById("zone0").innerHTML = data.destZone;
+        document.getElementById("stop0").innerHTML = data.dest;
     }
+
     let zbyvajiciZastavky = data.stops.length - stopIndex;
 
     let sipecky = Array.from(document.querySelectorAll('[data-group="stopMarkers"]')).reverse();
@@ -263,6 +276,7 @@ function updateTextFields(){
     }
     for (let i = 0; i < sipecky.length - 1; i++) {
         const element = sipecky[i];
+        zbyvajiciZastavky = (zbyvajiciZastavky == 0) ? 1 : zbyvajiciZastavky;
         //sipka4 | sipka4end => 9 | 8 => zbývá 5 zastávek
         //sipka3 | sipka3end => 7 | 6 => zbývá 4 zastávky
         //sipka2 | sipka2end => 5 | 4 => zbývá 3 zastávky
