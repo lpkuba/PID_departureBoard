@@ -149,12 +149,43 @@
                 </div>
             </div>
         </div>
-        <div class="popup cil" id="popupCil_known">
+        <div class="popup sluzba" id="popupCil_unknown" hidden>
+            <div class="popisek">
+                <span>Zadejte číslo cíle</span>
+            </div>
+            <div class="almSqrBg" style="margin: 0; letter-spacing: 1px;" id="cilField">Chyba!</div>
+            <div class="numpad" id="numpadCil">
+                <div class="row">
+                    <div class="clickableBtnGlobal button" data-value="numpad1">1</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad2">2</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad3" style="width:117px;">3</div>
+                    <div class="clickableBtnGlobal button" data-value="numpadBack" style="width:117px; margin-right: 0;"><img src="./icons/BackSpaceIcon64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" data-value="numpad4">4</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad5">5</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad6" style="width:117px;">6</div>
+                    <div class="clickableBtnGlobal button" data-value="numpadLeft" style="width:117px; margin-right: 0;"><img src="./icons/Sipka_L64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" data-value="numpad7">7</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad8">8</div>
+                    <div class="clickableBtnGlobal button" data-value="numpad9" style="width:117px;">9</div>
+                    <div class="clickableBtnGlobal button" data-value="numpadRight" style="width:117px; margin-right: 0;"><img src="./icons/Sipka_R64.png" width="64px" height="64px" draggable="false"></div>
+                </div>
+                <div class="row">
+                    <div class="clickableBtnGlobal button" data-value="numpad0">0</div>
+                    <div class="clickableBtnGlobal button" style="opacity: 0;"></div>
+                    <div class="button" style="width:117px;" data-value="numpadYes"><img src="./icons/Potvrd64.png" width="64px" height="64px"></div>
+                    <div class="button" style="width:117px; margin-right: 0;" data-value="numpadNo"><img src="./icons/Zrus64.png" width="64px" height="64px" ></div>
+                </div>
+            </div>
+        </div>
+        <div class="popup cil" id="popupCil_known" hidden>
             <div class="obsah">
                 <div class="text">
                     <span>Spoj jede do zastávky:</span>
                     <span style="text-align: left;" id="cilText">Černý Most &lt;B&gt;</span>
-                    
                 </div>
                 <div class="button" id="popupCilOK" onclick="this.parentElement.parentElement.hidden = true">OK</div>
             </div>
