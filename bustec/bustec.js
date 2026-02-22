@@ -2,58 +2,61 @@ let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, veh
 let connectionReady = false;
 
 const socket = new WebSocket("ws://192.168.2.67:3001");
-
+const inputType = 0;
+//0 = default websocket, 1 = nabourani konektelu
 
 // Connection opened
-socket.addEventListener("open", (event) => {
-    console.log("BUSTEC CLIENT WS LOADED");
-    socket.send(JSON.stringify({
-      "name": "bustec",
-      "type": "ois",
-      "data": "placeholder"
-    }))
-})
+if(inputType == 0){
+    socket.addEventListener("open", (event) => {
+        console.log("BUSTEC CLIENT WS LOADED");
+        socket.send(JSON.stringify({
+          "name": "bustec",
+          "type": "ois",
+          "data": "placeholder"
+        }))
+    })
 
 
-// Listen for messages
-socket.addEventListener("message", (msg) => {  
-    wsData = JSON.parse(msg.data);
-    console.log(wsData);
-    if(wsData.dataType == "routeData"){
-        if(announcement){
-            announcement = false;
-            document.getElementsByClassName("upcomingStopsContainer")[0].hidden = false;
-            document.getElementById("announcementContainer").hidden = true;
-        }
-
-        updateData(wsData.data, false);
+    // Listen for messages
+    socket.addEventListener("message", (msg) => {  
+        wsData = JSON.parse(msg.data);
         console.log(wsData);
+        if(wsData.dataType == "routeData"){
+            if(announcement){
+                announcement = false;
+                document.getElementsByClassName("upcomingStopsContainer")[0].hidden = false;
+                document.getElementById("announcementContainer").hidden = true;
+            }
 
-    }
-    else if(wsData.dataType == "liveData"){
-        stopIndex = wsData.data.stopIndex;
-        linkaActive = wsData.data.linkaActive;
-        vehicleInStop(wsData.data.vehInStop);
-        updateTextFields();
-    }
-    else if(wsData.dataType == "annData"){
-        announcement = true;
-        for (const element of document.getElementsByClassName("upcomingStopsContainer")) {
-            element.hidden = true;
-            console.log("Skrývám todle:");
-            console.log(element);
+            updateData(wsData.data, false);
+            console.log(wsData);
+
         }
-        document.getElementById("announcementContainer").hidden = false;
-        announcementTimeout = wsData.data.timeout;
-        document.getElementById("announcementCZText").innerHTML = wsData.data.cz.text;
-        document.getElementById("announcementCZText").style.fontSize = wsData.data.cz.size;
-        document.getElementById("announcementENText").innerHTML = wsData.data.en.text;
-        document.getElementById("announcementENText").style.fontSize = wsData.data.en.size;
-    }
-    else if(wsData.dataType == "unknwRouteData"){
-        updateData(wsData.data, true);
-    }
-});
+        else if(wsData.dataType == "liveData"){
+            stopIndex = wsData.data.stopIndex;
+            linkaActive = wsData.data.linkaActive;
+            vehicleInStop(wsData.data.vehInStop);
+            updateTextFields();
+        }
+        else if(wsData.dataType == "annData"){
+            announcement = true;
+            for (const element of document.getElementsByClassName("upcomingStopsContainer")) {
+                element.hidden = true;
+                console.log("Skrývám todle:");
+                console.log(element);
+            }
+            document.getElementById("announcementContainer").hidden = false;
+            announcementTimeout = wsData.data.timeout;
+            document.getElementById("announcementCZText").innerHTML = wsData.data.cz.text;
+            document.getElementById("announcementCZText").style.fontSize = wsData.data.cz.size;
+            document.getElementById("announcementENText").innerHTML = wsData.data.en.text;
+            document.getElementById("announcementENText").style.fontSize = wsData.data.en.size;
+        }
+        else if(wsData.dataType == "unknwRouteData"){
+            updateData(wsData.data, true);
+        }
+    });
+}
 
 function init(){
     casovac = Date.now();
@@ -127,6 +130,21 @@ function hodiny(){
         casovac = Date.now();
        
     }
+    if(inputType == 1){
+        (async () => {
+            console.log("spuštěn konektel fetcher 5000");
+            let temp = await fetchKonektelData();
+            let str = JSON.stringify(temp);
+            if(str != prevData){
+                updateData(temp.data, temp.unknownData);
+                vehicleInStop(temp.vehInStop);
+                prevData = str;
+                linkaActive = temp.data.stops.length > 0 ? true : false;
+            }
+            
+        })();
+    }
+
 
     if(announcementTimeout > 1 && casovac > announcementTimeout){
         announcement = false;
@@ -315,6 +333,7 @@ function updateTextFields(mode){
 }
 
 function vehicleInStop(goo){
+    console.log(goo);
     if(goo != undefined){
         vehInStop = goo;
     }
@@ -342,9 +361,15 @@ function vehicleInStop(goo){
 }
 
 async function getNextStopDepartures(id) {
-    let response = await fetch("../options.json");
+    let response = await fetch("./options.json");
     let fetchOpt = await response.json();
-    const result = await fetch(`https://api.golemio.cz/v2/pid/departureboards?cisIds=${id}&filter=routeHeadingOnce&total=12`, fetchOpt);
+    let result;
+    if(inputType == 0){
+        result = await fetch(`https://api.golemio.cz/v2/pid/departureboards?cisIds=${id}&filter=routeHeadingOnce&total=12`, fetchOpt);
+    }
+    else if(inputType == 1){
+        result = await fetch(`https://api.golemio.cz/v2/pid/departureboards?names=${data.stops[stopIndex].name}&filter=routeHeadingOnce&total=12`, fetchOpt);
+    }
     const mezi = await result.json();
     const departures = mezi.departures;
     let toAdd = "";
