@@ -1,0 +1,485 @@
+:root{
+    --cerna-pozadi: rgba(53, 53, 53);
+    --bila-text: white;
+    --bila-podbarveni: rgba(200, 200, 200); 
+    --seda-podbarveni: rgba(86,86,86);
+    --cerna-text: rgba(29, 29, 29);
+    --nextstop-text: white;
+    --nextstop-koule: rgba(53, 53, 53);
+    --laststop-text: var(--cerna-text);
+    --laststop-kouleoutline: var(--cerna-text);
+    --laststop-koule: var(--cerna-text);
+    --cara-bottom-offset: 120px;
+    --delka-animace: 0.4s;
+    --delka-posun: 1s;
+    --fullvyska: 1080px;
+    --fullsirka: 1760px;
+}
+/*===ODKOMENTOVAT PRO PANEL===*/
+/*html{
+    overflow-y: hidden;
+    overflow-x: hidden;
+}*/
+body{
+    margin: 0;
+    font-family: PIDGrotesk;
+    background-color: black;
+    zoom: 40%;
+}
+.mainContainer{
+    width: var(--fullsirka);
+    height: var(--fullvyska);
+    background-color: var(--cerna-pozadi);
+    z-index: -1;
+}
+
+.linkabg{
+    height: 240px;
+    width: 360px;
+    background-color: var(--bila-podbarveni);
+    z-index: 0;
+    position: absolute;
+    transition: width var(--delka-animace) linear;
+}
+
+.linka{
+    height: 240px;
+    width: 360px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 130px;
+    z-index: 1;
+    color: var(--cerna-text);
+    transition: all var(--delka-animace) linear;
+}
+.nextStop{
+    left: 530px;
+    top: 92px;
+    max-width: 1000px;
+    font-size: 80px;
+    position: absolute;
+    color: var(--nextstop-text);
+    display: flex;
+    z-index: 1;
+    transition: color var(--delka-animace) linear;
+    transform-origin: left;
+    transform: scaleY(1.27275) scaleX(1.31026587729);
+}
+
+#stop1{
+    color: var(--bila-text);
+    left: 530px;
+    top: 255px;
+    position: absolute;
+    
+}
+
+#stop1.move{
+    transition: transform var( --delka-posun) linear;
+    color: var(--nextstop-text);
+    transform: translateY(-128px);
+}
+
+.nextStop.move{
+    transition: transform 1.8s linear, color 1.8s linear;
+    transform: translateY(-360px);
+}
+.nextStop.plsAppear{
+    transition: color var(--delka-animace) linear;
+    color: var(--nextstop-text);
+}
+.debug{
+    display: none;
+    z-index: -2;
+    bottom: 0px;
+    position:absolute;
+}
+
+.debug button{
+    font-size: 150px;
+}
+
+/* Hlavní kontejner šňůry */
+.line-container {
+    position: absolute;
+    top: 0; /* Uprav si podle potřeby */
+    left: 432px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 60px;
+    height: calc(var(--fullvyska) - var(--cara-bottom-offset));
+    transition: height var(--delka-posun) linear;
+}
+
+.line-container:first-child {
+    margin-top: 95px;
+    margin-bottom: 90px;
+}
+
+/* Vertikální čára propojující kuličky */
+.line-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 13px;
+    background-color: var(--bila-text);
+    z-index: 2;
+}
+
+
+/* Společný styl pro všechny kuličky */
+.stop-dot {
+    width: 53px;
+    height: 53px;
+    background-color: var(--cerna-pozadi); /* Barva vnitřku */
+    border: 4px solid var(--bila-text); /* Obrys šňůry */
+    border-radius: 40px;
+    margin-bottom: 69px; /* Mezera mezi zastávkami */
+    z-index: 2;
+    box-sizing: border-box;
+    transition: border-color var(--delka-animace) linear, background-color var(--delka-animace) linear;
+
+}
+
+.stop-dot.move{
+    transition: transform var(--delka-posun) linear;
+    transform: translateY(-122px);
+}
+
+.stop-dot-first {
+    width: 53px;
+    height: 53px;
+    background-color: var(--cerna-pozadi); /* Barva vnitřku */
+    border: 4px solid var(--bila-text); /* Obrys šňůry */
+    border-radius: 40px;
+    margin-bottom: 69px; /* Mezera mezi zastávkami */
+    margin-top: 262px;
+    z-index: 2;
+    box-sizing: border-box;
+    transition: border-color var(--delka-animace) linear, background-color var(--delka-animace) linear;
+
+}
+
+.stop-dot-first.move{
+    transform-origin: center;
+    transition: transform var(--delka-posun) linear;
+    transform: translateY(-167px) scale(1.507);
+} 
+
+.no-dot{
+    width: 53px;
+    height: 53px;
+    margin-bottom: 69px; /* Mezera mezi zastávkami */
+    z-index: -1;
+    box-sizing: border-box;
+}
+
+.stop-dot-last {
+    width: 53px;
+    height: 53px;
+    background-color: var(--cerna-pozadi); /* Barva vnitřku */
+    border: 4px solid var(--bila-text); /* Obrys šňůry */
+    border-radius: 40px;
+    margin-bottom: 34px; /* Mezera mezi zastávkami */
+    z-index: 2;
+    box-sizing: border-box;
+    transition: border-color var(--delka-animace) linear, background-color var(--delka-animace) linear;
+
+}
+
+.stop-dot-last.move{
+    transition: transform var(--delka-posun) linear;
+    transform: translateY(-122px);
+}
+
+/* PRVNÍ KULIČKA - Přebarvitelná výplň */
+.stop-dot.is-current {
+    margin-top: 95px;
+    margin-bottom: 115px; /* Mezera mezi zastávkami */
+    background-color: var(--nextstop-koule); /* Tady změníš barvu výplně */
+    border-color: var(--bila-text);
+    width: 53px;
+    height: 53px;
+    transform-origin: center;
+    transform: scale(1.51);
+    transition: border-color var(--delka-animace) linear, background-color var(--delka-animace) linear;
+    position: absolute; /*920px je třeba pro to aby lajna vyjela nahoru*/
+}
+
+.stop-dot.is-current.move{
+    transition: transform 1.8s linear, background-color var(--delka-animace) linear;
+    transform: translateY(-360px);
+}
+
+
+.stop-dotted {
+    width: 15px; /* Šířka kuličky */
+    height: 133px;
+    content: "";
+    top: 850px;
+    left: 454px;
+    position: absolute;
+    width: 0px;
+    background-color: none;
+    border-left: 16px dotted white;
+    z-index: 3;
+    transition: all var(--delka-animace) linear;
+}
+
+#lastStopDot{
+    content: "";
+    width: 53px;
+    height: 53px;
+    background-color: var(--laststop-koule);
+    border-radius: 50%;
+    z-index: 1;
+    top: 990px;
+    left: 435px;
+    box-sizing: border-box;
+    position: absolute;
+    transition: background-color var(--delka-posun) linear;
+}
+#lastStopDot.move{
+    transform-origin: center;
+    transition: transform var(--delka-posun) linear, background-color var(--delka-posun) linear, border var(--delka-posun) linear;
+    transform: translateY(-895px) scale(1.507);
+    background-color: var(--cerna-pozadi); /* Barva vnitřku */
+    border: 4px solid var(--bila-text);
+    z-index: 2;
+
+}
+#lastStopStrizka{
+    width: 80px;
+    height: 44px;
+    background-color: white;
+    top: 961px;
+    left: 422px;
+    position: absolute;
+    z-index: 2;
+    clip-path: polygon(9.207% 0%, 49.872% 68.534%, 90.537% 0%, 100% 15.517%, 49.872% 100%, 0% 15.517%);
+    transition: all var(--delka-animace) linear;
+}
+#lastStopStrizka.move{
+    background-color: transparent;
+}
+
+.bottomLine{
+    background-color: var(--bila-podbarveni);
+    width: var(--fullsirka);
+    height: 120px;
+    bottom: 0px;
+    left: 0;
+    top: 960px;
+    position: absolute;
+}
+.viaStops{
+    background-color: var(--seda-podbarveni);
+    width: var(--fullsirka);
+    height: 120px;
+    top: 840px;
+    position: absolute;
+    z-index: 2;
+    transition: all var(--delka-animace) linear;
+}
+
+#nextStopMinutes{
+    color:var(--bila-text);
+    font-size: 30px;
+    font-family: "Roboto Condensed";
+    font-weight: 400;
+    z-index: 1;
+    position: absolute;
+    transition: color var(--delka-animace) linear;
+    left: 535px;
+    top: 20px
+}
+
+.nextStopZoneDiv{
+    display: flex;
+    justify-content: flex-end;
+    font-family: "Roboto";
+    font-weight: 300;
+    font-size: 35px;
+    width: calc(var(--fullsirka) - 25px);
+    color:  var(--nextstop-text);
+    transition: color var(--delka-animace) linear;
+    position: absolute;
+    top:25px;
+    padding-right: 25px;
+    z-index: 1;
+    align-items: center;
+}
+
+.nextStopZoneDiv b{
+    font-family: "Roboto";
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+[data-poletyp="upStop"]{
+    transition: color var(--delka-animace) linear;
+}
+
+#zone0{
+    font-family: PIDGrotesk;
+    font-size: 70px;
+    margin-left: 10px;
+}
+
+
+
+.stopMin{
+    color: var(--bila-text);
+    font-family: "Roboto Condensed";
+    font-size: 35px;
+    text-align: right;
+    position: absolute;
+    left: 0px;
+    transition: color var(--delka-animace) linear;
+}
+
+#stop1min{
+    top: 265px;
+    width: 385px;
+}
+#stop2min{
+    top: 385px;
+    width: 385px;
+}
+#stop3min{
+    top: 505px;
+    width: 385px;
+}
+#stop4min{
+    top: 625px;
+    width: 385px;
+}
+#stop5min{
+    top: 745px;
+    width: 385px;
+}
+#stop6min{
+    top: 865px;
+    width: 385px;
+}
+
+#stop1{
+    color: var(--bila-text);
+    left: 530px;
+    top: 255px;
+    position: absolute;
+    font-size: 80px;
+}
+
+#stop1.move{
+    transition: transform var( --delka-posun) linear;
+    color: var(--nextstop-text);
+    transform-origin: left;
+    transform: scaleY(1.27275) scaleX(1.31026587729) translateY(-129px);
+}
+
+
+
+#stop2{
+    color: var(--bila-text);
+    left: 530px;
+    top: 375px;
+    position: absolute;
+    font-size: 80px;
+    
+}
+
+#stop2.move{
+    transition: transform var( --delka-posun) linear;
+    transform: translateY(-120px);
+}
+
+#stop3{
+    color: var(--bila-text);
+    left: 530px;
+    top: 495px;
+    position: absolute;
+    font-size: 80px;
+    
+}
+
+#stop3.move{
+    transition: transform var( --delka-posun) linear;
+    transform: translateY(-120px);
+}
+
+#stop4{
+    color: var(--bila-text);
+    left: 530px;
+    top: 615px;
+    position: absolute;
+    font-size: 80px;
+    
+}
+
+#stop4.move{
+    transform: translateY(-120px);
+    transition: transform var( --delka-posun) linear;
+}
+
+#stop5{
+    color: var(--bila-text);
+    left: 530px;
+    top: 735px;
+    position: absolute;
+    font-size: 80px;
+    
+}
+
+#stop5.move{
+    transition: transform var( --delka-posun) linear;
+    transform: translateY(-120px);
+}
+
+#stop6{
+    color: var(--bila-text);
+    left: 530px;
+    top: 855px;
+    position: absolute;
+    font-size: 80px;
+    z-index: 1;
+}
+
+#stop6.move{
+    transition: transform var( --delka-posun) linear;
+    transform: translateY(-120px);
+}
+
+#destination{
+    display: flex;
+    align-items: center;
+    left: 530px;
+    height: 120px;
+    font-family: PIDGrotesk;
+    font-size: 80px;
+    position: absolute;
+    color: var(--laststop-text);
+    transition: all var(--delka-animace) linear;
+}
+
+#destination.move{
+    transform: translateY(-885px) scaleY(1.27275) scaleX(1.31026587729);
+    transition: transform var( --delka-posun) linear;
+    transform-origin: left;
+    color: var(--bila-text);
+}
+
+#time{
+    display: flex;
+    align-items: center;
+    left: 25px;
+    height: 120px;
+    font-family: PIDGrotesk;
+    font-size: 80px;
+    position: absolute;
+    color: var(--cerna-text)
+}

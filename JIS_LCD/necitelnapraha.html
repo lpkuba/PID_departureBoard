@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEČitelná Praha - Nový Informační Panel</title>
+    <link rel="stylesheet" href="./necitelnapraha.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.1.0"></script>
+    <script src="./bustec.js"></script>
+    <!--Adaptační script pro vstupní data z PP (nativní podpora konektel SW, staženo dávno z uložto)-->
+    <script src="./konektel.js"></script>
+    <script>
+        const panelType = 1;
+        const animDuration = 1000;
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!--Já jakožto autor zásadně nesouhlasím s novými změnami které projekt Čitelná Praha chce zavést, stávající systém fungující v příměstských autobusech PID je funkční, užívá veškeré funkce popisované jako "revoluční" u tohoto skvostu, nemění pořadí zastávek a je přehlednější!-->
+    <!--Zajímavostí vašeho projektu je pilotní provoz bez jakékoliv zpětné vazby (tj. QR kódy, průzkumníci v daném autobuse či letáky) od širší veřejnosti?-->
+</head>
+<body onload='init()'>
+    <div class="mainContainer">
+        <span class="linka" id="line">152</span>
+        <span id="nextStopMinutes" class="stopMin">1 min</span>
+        <div data-poleTyp="upStop" class="nextStop" id="stop0">Českomoravská</div>
+        <div class="nextStopZoneDiv"><b>pásmo</b>&nbsp;zone&NonBreakingSpace;<span id="zone0">P</span></div>
+        <div class="linkabg"></div>
+        <div class="line-container">
+            <div data-poleTyp="upStopDot" class="stop-dot is-current" id="currDot"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot-first"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot"></div>
+            <div data-poleTyp="upStopDot" class="stop-dot-last"></div>
+        </div>
+    <div class="stop-dotted" id="viaStopDots"></div>
+    <div id="lastStopDot"></div>
+    <div id="lastStopStrizka"></div>
+
+    <span data-poleTyp="upStopMin" id="stop1min" class="stopMin">2 min</span>
+    <span data-poleTyp="upStop" id="stop1">Vysočanská</span>
+    <span id="zone1"></span>
+    <span data-poleTyp="upStopMin" id="stop2min" class="stopMin">3 min</span>
+    <span data-poleTyp="upStop" id="stop2">Prosek</span>
+    <span id="zone2"></span>
+    <span data-poleTyp="upStopMin" id="stop3min" class="stopMin">4 min</span>
+    <span data-poleTyp="upStop" id="stop3">Prosek</span>
+    <span id="zone3"></span>
+    <span data-poleTyp="upStopMin" id="stop4min" class="stopMin">5 min</span>
+    <span data-poleTyp="upStop" id="stop4">Prosek</span>
+    <span id="zone4"></span>
+    <span data-poleTyp="upStopMin" id="stop5min" class="stopMin">6 min</span>
+    <span data-poleTyp="upStop" id="stop5">Prosek</span>
+    <span id="zone5"></span>
+    <span data-poleTyp="upStop" id="stop6">Prosek</span>
+    <span data-poleTyp="upStopMin" id="stop6min" class="stopMin">7 min</span>
+    <div class="viaStops" id="viaStops"></div>
+    <div class="bottomLine">
+        <span id="time">12:34</span>
+        <span id="destination">Prosek</span>
+    </div>
+    </div>
+    <div class="debug">
+        <button onclick="necitelnaPraha()">Vyhlaš</button>
+    </div>
+</body>
+</html>
