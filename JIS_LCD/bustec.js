@@ -1,10 +1,10 @@
-let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop, wsData, announcement = false, announcementTimeout, linkaActive = false, prevData;
+let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop = false, wsData, announcement = false, announcementTimeout, linkaActive = false, prevData;
 let connectionReady = false;
 let npDataInit = false;
 let npCasovac = 0;
 
 const socket = new WebSocket("ws://192.168.2.67:3001");
-const inputType = 1;
+const inputType = 0;
 //0 = default websocket, 1 = nabourani konektelu
 
 //const panelType = 1; => definovano v <script></> kazde HTML stranky panelu
@@ -27,21 +27,30 @@ if(inputType == 0){
         wsData = JSON.parse(msg.data);
         console.log(wsData);
         if(wsData.dataType == "routeData"){
-            if(announcement){
-                announcement = false;
-                document.getElementsByClassName("upcomingStopsContainer")[0].hidden = false;
-                document.getElementById("announcementContainer").hidden = true;
+            if(panelType == 0){
+                if(announcement){
+                    announcement = false;
+                    document.getElementsByClassName("upcomingStopsContainer")[0].hidden = false;
+                    document.getElementById("announcementContainer").hidden = true;
+                }
+            
+                updateData(wsData.data, false);
+                console.log(wsData);
             }
-
-            updateData(wsData.data, false);
-            console.log(wsData);
-
+            else if(panelType == 1){
+                necitelnaPraha(wsData);
+            }
         }
         else if(wsData.dataType == "liveData"){
             stopIndex = wsData.data.stopIndex;
             linkaActive = wsData.data.linkaActive;
-            vehicleInStop(wsData.data.vehInStop);
-            updateTextFields();
+            if(panelType == 0){
+                vehicleInStop(wsData.data.vehInStop);
+                updateTextFields();
+            }
+            else if(panelType == 1){
+                necitelnaPraha(wsData);
+            }
         }
         else if(wsData.dataType == "annData"){
             announcement = true;
@@ -187,6 +196,7 @@ function posunZastavky(smer){
 }
 
 function updateTextFields(mode){
+
     if(panelType == 0){
         document.getElementById("indexZastavky").innerHTML = "Index zastávky: " + stopIndex;
         document.getElementById("mainDiv").className = "departures " + data.type;
@@ -205,6 +215,8 @@ function updateTextFields(mode){
     if(data.stops.length > 1 || panelType == 0){
         document.getElementById("destination").innerHTML = data.dest;
         if(panelType == 1){
+            //pro nečitelnou prahu smazání duplo konečné
+            console.warn("Mažu poslední element array data.stops!");
             data.stops.pop();
         }
     }
@@ -468,6 +480,9 @@ function updateTextFields(mode){
                     }
                 i++;
             }
+            for (const element of mins) {
+                element.style = "";
+            }
         }
     }
     
@@ -605,17 +620,35 @@ async function getNextStopDepartures(id) {
 }
 
 let npStopOffset = 0;
+let npRouteData = {};
 let npPrevData = {};
 let npAnimRunning = false;
-let npReturn = false;
+let npPrevVehInStop = false;
 
 function necitelnaPraha(npData){
+    //console.log(JSON.stringify(npData));
+    //data handling
+    if(inputType == 0 && npData.dataType != undefined){
+        if(npData.dataType == "routeData"){
+            npData = JSON.parse(JSON.stringify(npData.data));
+            npRouteData = JSON.parse(JSON.stringify(npData));
+        }
+        else if(npData.dataType == "liveData"){
+            vehInStop = npData.data.vehInStop;
+            npData = {
+                 type: npRouteData.type,
+                 line: npRouteData.line,
+                 dest: npRouteData.dest,
+                stops: npRouteData.stops.slice(npData.data.stopIndex)
+            };
+            //console.log(npData);
+        }
+    }
     let inv = !vehInStop;
     document.documentElement.style.setProperty("--laststop-koule", npData.stops.length == 1 ? "transparent" : "var(--cerna-text)");
     document.documentElement.style.setProperty("--cara-bottom-offset", npData.stops.length == 1 ? "920px" : "80px");
     document.getElementById("lastStopStrizka").className = npData.stops.length == 1 ? "move" : "";
 
-    npReturn = false;
     if(JSON.stringify(npPrevData) == "{}" ){//při čistém definování
         console.log("First definigtion");
         npAnimUpdate(undefined, npData);
@@ -624,57 +657,59 @@ function necitelnaPraha(npData){
     }
 
     if(npPrevData.stops.length - npData.stops.length != 0){  //posun či posun
-        npAnimUpdate(undefined, npData);
+        npAnimUpdate("stops", npData);
         npPrevData = JSON.parse(JSON.stringify(npData));
         return;
     }
-
     if(npData.line != npPrevData.line){ //změna linky
-        npAnimUpdate(undefined, npData);
+        npAnimUpdate("", npData);
         npPrevData = JSON.parse(JSON.stringify(npData));
         return;
     }
 
-    console.warn(vehInStop ? "Vozidlo přijelo na zastávku" : "Vozidlo vyjelo ze zastávky");
+
+    /*console.warn(vehInStop ? "Vozidlo přijelo na zastávku" : "Vozidlo vyjelo ze zastávky");
     console.log(npPrevData);
     console.warn("Prev len: " + npPrevData.stops.length);
     console.log(npData);
     console.warn("New len: " + npData.stops.length);
-    console.warn("Changed by: " + String(npPrevData.stops.length - npData.stops.length));
+    console.warn("Changed by: " + String(npPrevData.stops.length - npData.stops.length));*/
 
     //když vozidlo bylo v zastávce (čili poslední stav proměnné vehInStop byl true, jenže na konci této funkce je negace)
-    if(!inv){
+    if(!inv && vehInStop != npPrevVehInStop){
         updateData(npData);
-        //provede změnu barev na
-        document.getElementsByClassName("nextStop")[0].classList.remove("plsAppear");
         document.getElementsByClassName("linkabg")[0].style.width = inv ? "360px" : "var(--fullsirka)";
         document.getElementById("nextStopMinutes").style.color = !inv ? "transparent" : "";
         document.documentElement.style.setProperty("--nextstop-text", (inv ? "white" : "rgba(29, 29, 29)"));
         document.documentElement.style.setProperty("--nextstop-koule", (inv ? "rgba(53, 53, 53)" :"white" ));
         if(data.stops.length > 1){
             document.getElementById("lastStopDot").className = "";
-            document.getElementById("lastStopDot").style.color = "";
+            document.getElementById("lastStopDot").style = "";
         }
     }
-    else{
+    else if(inv && vehInStop != npPrevVehInStop){
         document.getElementsByClassName("linkabg")[0].style.width = inv ? "360px" : "var(--fullsirka)";
         document.documentElement.style.setProperty("--nextstop-text", (inv ? "white" : "rgba(29, 29, 29)"));
         document.documentElement.style.setProperty("--nextstop-koule", (inv ? "rgba(53, 53, 53)" :"white" ));
         document.getElementById("destination").className = npData.stops.length == 1 ? "move" : "";
         let upStops = document.querySelectorAll('[data-poletyp="upStop"]');
         let dots = document.querySelectorAll('[data-poletyp="upStopDot"]')
+        let minEl = document.getElementsByClassName("stopMin");
         for (const element of dots) {
             element.classList.add("move");
         }           
         for (const element of upStops) {
             element.classList.add("move");
         }
+        for (const element of minEl) {
+            element.style = "color: transparent;";
+        }
         if(data.stops.length == 1){
             document.getElementById("lastStopDot").className = "move";
         }
         else{
             document.getElementById("lastStopDot").className = "";
-            document.getElementById("lastStopDot").style.color = "";
+            document.getElementById("lastStopDot").style = "";
 
         }
         console.log("Před timeoutem");
@@ -686,7 +721,6 @@ function necitelnaPraha(npData){
                 document.getElementById("lastStopDot").style = "background-color: transparent; transition: none;";
                 document.getElementById("lastStopDot").className = "";
             }
-
             console.log("V timeoutu");
             //document.getElementsByClassName("nextStop")[0].classList.add("plsAppear");
             if(document.getElementById("stop0").innerHTML == npData.stops[0].name && npAnimRunning == false){ //když se názvy shodujou
@@ -709,12 +743,14 @@ function necitelnaPraha(npData){
             updateData(npData);
         }, animDuration*2);
     }
+    npPrevVehInStop = vehInStop;
     npPrevData = JSON.parse(JSON.stringify(npData));
 }
 
 function npAnimUpdate(mode,npData){
     let stopEl;
     let dotEl;
+    let minEl;
     if(mode == "line" || mode == undefined){
         document.getElementById("line").style.color = "transparent";
     }
@@ -756,6 +792,9 @@ function npAnimUpdate(mode,npData){
         }
         if(npData.stops.length >= 8){
             for (const element of dotEl) {
+                element.style = "";
+            }
+            for (const element of minEl) {
                 element.style = "";
             }
         }
