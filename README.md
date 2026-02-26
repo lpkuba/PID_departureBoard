@@ -11,6 +11,9 @@ Do této složky přijdou zdrojová data používaná ve zbytku programů. Také
 ### /html_PP
 V této složce se nachází klon rozhraní palubního počítače "Arbor" který lze nalézt v autobusech Dopravního podniku hl.m. Prahy
 
+### /JIS_LCD
+Tato složka obsahuje rozhraní informačního systému vevnitř autobusu dle návrhu týmu NeČitelné Prahy a dle vlakových standardů PID s mírnými úpravami pro srovnání s autobusovou variantou (jednotný IS a má víc variant toť asi shrnutí celého projektu :D)
+
 ### /turnusCreator
 V této složce se nachází tvůrce pořadí pro html_PP, vygenerované JSONy je pak potřeba vložit do /services odkud si je PP sám vezme
 
