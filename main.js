@@ -207,8 +207,6 @@ async function updateDepartures() {
             let destEl = destInfoElements[i];
             let depTimeEl = depTimeElements[i];
             let delayEl = delayTimeElements[i];
-            
-            
         }
 }
 
