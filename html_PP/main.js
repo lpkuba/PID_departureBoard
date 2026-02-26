@@ -8,7 +8,7 @@ let playing = false;
 let soundIndex = 0;
 announcement.preload = "auto";
 const socket = new WebSocket("ws://localhost:3001");
-const ppVersion = "0.0.5"; //verze se mění pouze při změně formátu dat
+const ppVersion = "0.0.5"; //verze se mění pouze při změně formátu VSTUPNÍCH dat
 let turnusData = {};
 data = {
     sluzbaFull: "912 51 01",
