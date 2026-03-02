@@ -1,0 +1,309 @@
+* {box-sizing: border-box;}
+select,
+::picker(select) {
+  appearance: base-select;
+  border: 0;
+    transition: 0.4s;
+
+}
+
+body{
+    font-family: Roboto;
+    background-color: rgb(0, 0, 143);
+    color: aliceblue;
+    padding-top: 90px;
+}
+
+
+.controlBar{
+    display: flex;
+    gap: 10px;
+    color: rgb(255, 255, 255);
+    background-color: rgba(155, 155, 155, 0.5);
+    border-radius: 0 0 20px 20px;
+    padding: 0 2%;
+    position: fixed;
+    z-index: 5;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    min-height: 80px;
+    max-height: 90px;
+}
+
+.controlBar select{
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    color: rgb(255, 255, 255);
+    font-family: Roboto;
+    font-weight: 600;
+    font-size: 20px;
+    transition: 0.4s;
+    background-color: rgba(81, 255, 0, 0.3);
+    margin: 10px;
+    /*margin-left: auto;*/
+    max-width:350px;
+    border-radius: 10px 10px 20px 20px;
+    border-left: 2px solid  transparent;
+    border-right: 2px solid transparent;
+    border-top: 2px solid   transparent;
+
+
+}
+
+.controlBar select:open{
+    background-color: rgb(26, 82, 0);
+    border-radius: 10px 10px 0 0;
+    transition: 0.4s;
+    border-left: 2px solid rgb(194, 194, 194);
+    border-right: 2px solid rgb(194, 194, 194);
+    border-top: 2px solid rgb(194, 194, 194);
+
+}
+.controlBar select:hover{
+    background-color: rgb(26, 82, 0);
+    transition: 0.4s;
+}
+.controlBar select option{
+    display: flex;
+    align-items: center;
+    background-color: rgb(26, 82, 0);
+    color: rgb(255, 255, 255);
+    font-family: Roboto;
+    font-weight: 600;
+    font-size: 20px;
+    border: none;
+    gap: 10px;
+    transition: 0.4s;
+    border-left: 2px solid rgb(194, 194, 194);
+    border-right: 2px solid rgb(194, 194, 194);
+    border-collapse: collapse;
+    border-bottom: 1px solid rgba(194, 194, 194, 0.5);
+}
+.controlBar select option:last-of-type{
+    border-bottom: 2px solid rgb(194, 194, 194);
+}
+
+.controlBar select option:hover{
+    background-color: rgba(26, 82, 0, 0.5);
+}
+
+.controlBar select option:checked{
+    color: white;
+    background-color: rgb(74, 122, 74);
+}
+
+.controlBar select option::checkmark{
+    content: "•";
+}
+
+.controlBar > button{
+    aspect-ratio: 1/1;
+    font-size: 50px;
+    border-radius: 50px;
+    border: 0;
+    transition: 0.4s;
+}
+
+.controlBar > button:hover{
+    border-radius: 10px;
+    box-shadow: 2px 2px 0 0;
+}
+
+
+#load{
+    background-color: rgba(0, 255, 0, 0.5);
+}
+#load:active{
+    background-color: rgba(0, 255, 0, 0.7);
+    transition: none;
+}
+#save{
+    background-color: rgba(0, 160, 255, 0.5);
+}
+#save:active{
+    background-color: rgba(0, 160, 255, 0.7);
+    transition: none;
+}
+
+.controlBar button:first-of-type{
+    margin-left: auto;
+}
+
+
+.content{
+    margin: 2.5% 5%;
+    background-color: lightgray;
+    color: rgb(30,30,30);
+    padding: 0.5% 2%;
+    border-radius: 20px;
+    display: flex;
+    height: 80vh;
+    flex-direction: column;
+}   
+
+.content#stops .stopList {
+    border: 2px gray solid;
+    background-color: rgb(241, 241, 241);
+    border-radius: 20px;
+    width: 40%;
+    height: 100%;
+    padding: 6px;
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+.content#stops .stopList .listWrapper{
+    background-color: rgb(255, 255, 255);
+    border: 1px gray solid;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 50vh;
+    overflow: hidden;
+}
+
+.content#stops .stopList .row{
+    display: flex;
+    min-width: 100%;
+    height: auto;
+}
+
+.content#stops .stopList .row.header{
+    font-weight: 600;
+    border-bottom: 2px solid gray;
+}
+
+
+
+.content#stops .stopList .row *{
+    border: 1px solid gray;
+    border-collapse: collapse;
+    padding: 0 2px;
+    display: flex;
+}
+
+.content#stops .stopList .row:hover:not(.header){
+    background-color: lightgray;
+}
+
+.content#stops .stopList .row :nth-child(1){
+    width: 12.5%;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.content#stops .stopList .row :nth-child(2){
+    width: 100%;
+    overflow: hidden;
+}
+.content#stops .stopList .row :nth-child(3){
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.content#stops .stopList .listWrapper .list{
+    width: 100%;
+    height: 100%;
+}
+
+.content#stops .controls{
+    display: flex;
+    margin: 0;
+    padding: 0;
+    border-collapse: collapse;
+    min-height: 5vh;
+}
+.content#stops .controls *:first-child{
+    width: 100%;
+    border-radius: 0 0 0 20px;
+    border: 0;
+    background-color: green;
+    color: white;
+    transition: 0.2s;
+    font-size: 20px;
+}
+.content#stops .controls *:first-child:hover{
+    background-color: lightgreen;
+    color:black;
+}
+
+.content#stops .controls *:last-child{
+    width: 100%;
+    border-radius: 0 0 20px 0;
+    border: 0;
+    border-left: 2px black solid;
+    background-color: red;
+    color: white;
+    transition: 0.2s;
+    font-size: 20px;
+
+}
+
+.content#stops .controls *:last-child:hover{
+    background-color: rgb(255, 138, 138);
+    color: black;
+}
+
+.content .row{
+    display: flex;
+}
+
+.content .row:not(:first-of-type){
+    justify-content: space-between;
+}
+
+
+.content#stops .stopProperties {
+    border: 2px gray solid;
+    background-color: rgb(241, 241, 241);
+    border-radius: 20px;
+    width: 50%;
+    height: 100%;
+    padding: 6px;
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+.content#stops .stopProperties .properties .row{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.content#stops .stopProperties .properties label{
+    font-weight: 420;
+    margin-right: 1vw;
+}
+.content#stops .stopProperties .properties input[type=text]{
+    background-color: white;
+    border: 1px gray solid;
+    border-radius: 20px;
+    box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.5);
+    height: 3vh;
+    padding-left: 1vw;
+    transition: 0.4s;
+    margin-left: auto;
+    margin-bottom: 5px;
+
+}
+.content#stops .stopProperties .properties input[type=text]:focus{
+    height: 4vh;
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+    border: 2px rgba(255, 0, 0, 0.5) solid;
+    background-color: antiquewhite;
+    outline: none;
+    
+}
+
+.content#stops .stopProperties .properties .row .transfers{
+    display: flex;
+    gap: 1vw;
+    justify-content: space-evenly;
+    overflow-x: scroll;
+    scroll-behavior: smooth;
+    width: 100%;
+}
+
+.content#stops .stopProperties .properties .row .transfers .box{
+    display: flex;
+    flex-direction: column;
+}

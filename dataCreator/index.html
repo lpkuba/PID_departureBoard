@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Creator for @lpkuba</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./main.css">
+    <script src="./main.js"></script>
+</head>
+<body onload="init()">
+    <div class="controlBar">
+        <h1>Tvůrce dat</h1>
+        <button id="load">📂</button>
+        <button id="save">💾</button>
+        <select id="rezim" name="rezim">
+            <button>
+                <selectedcontent></selectedcontent>
+            </button>
+            <option disabled selected value style="display: none">Zvolte upravovaný typ dat</option>
+            <option value="stops">Zastávky</option>
+            <option value="linky">Linky</option>
+            <option value="trips">Spoje</option>
+            <option value="services">Turnusy</option>
+        </select>
+    </div>
+    
+
+    <div id="stops" class="content">
+        <div class="row">
+            <h2>Editace zastávek</h2>             
+        </div>
+        <div class="row">
+            <div class="stopList">
+                <h3>Seznam zastávek</h3>
+                <div class="listWrapper">
+                    <div class="header row">
+                        <span>ID            </span>
+                        <span>Název zastávky</span>
+                        <span>Přestupy      </span>
+                    </div>
+                    <div class="list">
+                        <div class="row" onclick='selectStop(this)'>
+                            <span>0</span>
+                            <span>Černých Moc</span>
+                            <span>ano</span>
+                        </div>
+                        <div class="row">
+                            <span>1</span>
+                            <span>Černých Moc</span>
+                            <span>ne</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button>Vytvořit</button>
+                    <button>Smazat</button>
+                </div>
+            </div>
+            <div class="stopProperties">
+                <h3>Vlastnosti vybrané zastávky</h3>
+                <div class="properties">
+                    <div class="row">
+                        <label for="stopIdProperty">ID zastávky</label><input type="text" id="stopIdProperty">
+                    </div>
+                    <div class="row">
+                        <label for="stopNameProperty">Název zastávky</label><input type="text" id="stopNameProperty">
+                    </div>
+                    <div class="row">
+                        <label for="stopGtfsIdProperty">GTFS ID zast.</label><input type="text" id="stopGtfsIdProperty">
+                    </div>                    
+                    <div class="row" style="flex-direction: column;">
+                        <span class="header">Přestupy</span>
+                        <div class="transfers">
+                            <div class="box">
+                                <span>MetroA</span>
+                                <input type="checkbox" name="transfers" value="metroA">
+                            </div>
+                            <div class="box">
+                                <span>MetroB</span>
+                                <input type="checkbox" name="transfers" value="metroB">
+                            </div>
+                            <div class="box">
+                                <span>MetroC</span>
+                                <input type="checkbox" name="transfers" value="metroC">
+                            </div>
+                            <div class="box">
+                                <span>MetroD</span>
+                                <input type="checkbox" name="transfers" value="metroD">
+                            </div>
+                            <div class="box">
+                                <span>Vlak</span>
+                                <input type="checkbox" name="transfers" value="train">
+                            </div>
+                            <div class="box">
+                                <span>LD</span>
+                                <input type="checkbox" name="transfers" value="train">
+                            </div>
+                            <div class="box">
+                                <span>Přívoz</span>
+                                <input type="checkbox" name="transfers" value="ferry">
+                            </div>
+                            <div class="box">
+                                <span>LD</span>
+                                <input type="checkbox" name="transfers" value="train">
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="row">
+                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
+                    </div> 
+                    <div class="row">
+                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
+                    </div> 
+                    <div class="row">
+                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
+                    </div>                     
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
