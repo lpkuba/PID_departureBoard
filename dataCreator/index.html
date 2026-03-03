@@ -55,8 +55,8 @@
                     </div>
                 </div>
                 <div class="controls">
-                    <button>Vytvořit</button>
-                    <button>Smazat</button>
+                    <button onclick="createStop()">Vytvořit</button>
+                    <button onclick="deleteStop()">Smazat</button>
                 </div>
             </div>
             <div class="stopProperties">
@@ -69,26 +69,26 @@
                         <label for="stopNameProperty">Název zastávky</label><input type="text" id="stopNameProperty">
                     </div>
                     <div class="row">
-                        <label for="stopGtfsIdProperty">GTFS ID zast.</label><input type="text" id="stopGtfsIdProperty">
+                        <label for="stopAswIdProperty">ASW ID zast.</label><input type="text" id="stopAswIdProperty">
                     </div>                    
                     <div class="row" style="flex-direction: column;">
-                        <span class="header">Přestupy</span>
+                        <span class="header" style="font-weight: 400; background-color: rgba(30,30,30,0.7); color: white; width: 100%; text-align: center;">Přestupy</span>
                         <div class="transfers">
                             <div class="box">
                                 <span>MetroA</span>
-                                <input type="checkbox" name="transfers" value="metroA">
+                                <input type="checkbox" name="transfersM" value="A">
                             </div>
                             <div class="box">
                                 <span>MetroB</span>
-                                <input type="checkbox" name="transfers" value="metroB">
+                                <input type="checkbox" name="transfersM" value="B">
                             </div>
                             <div class="box">
                                 <span>MetroC</span>
-                                <input type="checkbox" name="transfers" value="metroC">
+                                <input type="checkbox" name="transfersM" value="C">
                             </div>
                             <div class="box">
                                 <span>MetroD</span>
-                                <input type="checkbox" name="transfers" value="metroD">
+                                <input type="checkbox" name="transfersM" value="D">
                             </div>
                             <div class="box">
                                 <span>Vlak</span>
@@ -96,27 +96,21 @@
                             </div>
                             <div class="box">
                                 <span>LD</span>
-                                <input type="checkbox" name="transfers" value="train">
+                                <input type="checkbox" name="transfers" value="funicular">
                             </div>
                             <div class="box">
                                 <span>Přívoz</span>
                                 <input type="checkbox" name="transfers" value="ferry">
                             </div>
-                            <div class="box">
-                                <span>LD</span>
-                                <input type="checkbox" name="transfers" value="train">
-                            </div>
                         </div>
                     </div> 
                     <div class="row">
-                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
-                    </div> 
+                        <label for="stopAnnFilenameProperty">Soubor hlášení</label><input type="text" id="stopAnnFilenameProperty">
+                    </div>
                     <div class="row">
-                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
-                    </div> 
-                    <div class="row">
-                        <label for="stopIdProperty">GTFS ID zast.</label><input type="text" id="stopIdProperty">
-                    </div>                     
+                        <button onclick="save()">Uložit</button>
+                        <button onclick="reload()">Vymazat</button>
+                    </div>                   
                     
                 </div>
             </div>
