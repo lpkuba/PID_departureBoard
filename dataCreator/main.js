@@ -56,12 +56,16 @@ function autosave(){
 
 function selectStop(selEl){
     let id = selEl.children[0].innerHTML;
-    if(currentElement != undefined){
-        currentElement.style = "";
-        currentElement = selEl;
-        currentElement.style = "background-color: pink;";
+    if(JSON.stringify(currentlyEditing) != "{}"){
+        currentElement = document.getElementsByClassName("list")[0].children[id];
+        document.getElementsByClassName("list")[0].children[currentlyEditing.id].style = "";
     }
-    currentElement = selEl;
+    else{
+        currentElement = selEl;
+    }
+    currentlyEditing = stops[id];
+    //currentElement = selEl;
+    currentElement.style = "background-color: pink;";
     reload(id);
 }
 
@@ -100,6 +104,31 @@ function createStop(){
     renderList();
 }
 
+function deleteStop(){
+    stops = deleteItemAtIndex(currentlyEditing.id, stops);
+    currentElement = undefined;
+    currentlyEditing = {};
+    renderList();
+}
+
+
+function deleteItemAtIndex(index, array){
+    let newArray = [];
+    let breakpointReached = false;
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if(i == index){
+            breakpointReached = true;
+        }
+        if(breakpointReached){
+            newArray[i-1] = element;
+        }
+        else{
+            newArray[i] = element;
+        }
+    }
+    return newArray;
+}
 function save(){
 
     let transfers = "";
