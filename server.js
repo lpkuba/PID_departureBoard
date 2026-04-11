@@ -127,6 +127,8 @@ app.listen(3000, () => {
   serverReady = true;
 });
 
+app.use(express.static(__dirname));
+
 async function setBustecTrip(tripId) {
     //console.log("před promise v setBustecTrip");
     return new Promise(async (resolve, reject) => {
