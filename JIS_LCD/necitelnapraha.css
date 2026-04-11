@@ -14,15 +14,18 @@
     --delka-posun: 1s;
     --fullvyska: 1080px;
     --fullsirka: 1760px;
+    --stop-font: "PIDGrotesk", "Roboto";
+    /*--stop-font:  "Roboto";*/
 }
-/*===ODKOMENTOVAT PRO PANEL===*/
+/*===ODKOMENTOVAT PRO OMSI===*/
 /*html{
     overflow-y: hidden;
     overflow-x: hidden;
 }*/
 body{
     margin: 0;
-    font-family: PIDGrotesk;
+    font-family: var(--stop-font);
+    font-weight: 700;
     background-color: black;
     zoom: 40%;
 }
@@ -79,7 +82,7 @@ body{
 #stop1.move{
     transition: transform var( --delka-posun) linear;
     color: var(--nextstop-text);
-    transform: translateY(-128px);
+    transform: translateY(-127px);
 }
 
 .nextStop.move{
@@ -167,7 +170,7 @@ body{
 .stop-dot-first.move{
     transform-origin: center;
     transition: transform var(--delka-posun) linear;
-    transform: translateY(-167px) scale(1.507);
+    transform: translateY(-166px) scale(1.507);
 } 
 
 .no-dot{
@@ -284,6 +287,37 @@ body{
     position: absolute;
     z-index: 2;
     transition: all var(--delka-animace) linear;
+    overflow: hidden;
+}
+
+.viaStops > div{
+    display: flex;
+    align-items: center;
+    height: 100%;
+    transition: background-color var(--delka-animace) linear, color var(--delka-animace) linear;
+}
+
+.viaStops.move > div{
+    transform: translateY(-120px);
+    transition: all var(--delka-animace) linear; 
+}
+
+.viaStops .stopName{
+    color: white;
+    font-family: Roboto;
+    font-weight: 400;
+    font-size: 80px;
+    left: 530px;
+    position: absolute;
+}
+
+/*.viaStops *{
+    transition: all var(--delka-animace) linear;
+}*/
+
+.viaStops.hidden *,.viaStops.hidden{
+    color: transparent;
+    background-color: transparent;
 }
 
 #nextStopMinutes{
@@ -325,7 +359,8 @@ body{
 }
 
 #zone0{
-    font-family: PIDGrotesk;
+    font-family: var(--stop-font);
+    font-weight: 600;
     font-size: 70px;
     margin-left: 10px;
 }
@@ -335,6 +370,7 @@ body{
 .stopMin{
     color: var(--bila-text);
     font-family: "Roboto Condensed";
+    font-weight: 400;
     font-size: 35px;
     text-align: right;
     position: absolute;
@@ -459,7 +495,8 @@ body{
     align-items: center;
     left: 530px;
     height: 120px;
-    font-family: PIDGrotesk;
+    font-family: var(--stop-font);
+    font-weight: 700;
     font-size: 80px;
     position: absolute;
     color: var(--laststop-text);
@@ -478,7 +515,7 @@ body{
     align-items: center;
     left: 25px;
     height: 120px;
-    font-family: PIDGrotesk;
+    font-family: var(--stop-font);
     font-size: 80px;
     position: absolute;
     color: var(--cerna-text)
