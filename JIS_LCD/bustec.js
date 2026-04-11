@@ -1,9 +1,10 @@
-let connectionInterval, stopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop = false, wsData, announcement = false, announcementTimeout, linkaActive = false, prevData;
+let connectionInterval, stopIndex = 0, wsStopIndex = 0, data, clockInterval, ipAddr, casovac, vehInStop = false, wsData, announcement = false, announcementTimeout, linkaActive = false, prevData;
 let connectionReady = false;
 let npDataInit = false;
 let npCasovac = 0;
+ipAddr = location.hostname;
 
-const socket = new WebSocket("ws://192.168.2.67:3001");
+const socket = new WebSocket(`ws://${ipAddr}:3001`);
 const inputType = 0;
 //0 = default websocket, 1 = nabourani konektelu
 
@@ -43,6 +44,7 @@ if(inputType == 0){
         }
         else if(wsData.dataType == "liveData"){
             stopIndex = wsData.data.stopIndex;
+            wsStopIndex = stopIndex;
             linkaActive = wsData.data.linkaActive;
             if(panelType == 0){
                 vehicleInStop(wsData.data.vehInStop);
@@ -85,7 +87,7 @@ function init(){
 }
 
 async function connect(){
-    ipAddr = document.getElementById("serverIP").value;
+    ipAddr = location.hostname;
     console.log(ipAddr);
     let regex = /^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
     if(!regex.test(ipAddr) || ipAddr == ""){
@@ -127,7 +129,17 @@ function hodiny(){
     const ted = Date.now();
     let hh = String(date.getHours()).padStart(2, "0");
     let mm = String(date.getMinutes()).padStart(2, "0");
-    document.getElementById("time").innerHTML = `${hh}:${mm}`;
+    if(date.getSeconds() % 2 > 0){
+        document.getElementById("time").innerHTML = `${hh}<span>:</span>${mm}`;
+    }
+    else{
+        document.getElementById("time").innerHTML = `${hh}<span style="color: transparent">:</span>${mm}`;
+    }
+    npCasovac++;
+    if(npCasovac >= 3 && npViaStops){
+        npCasovac = 0;
+        npViaStopsAnim();
+    }
     //console.log((casovac - ted) / 1000 );
     //console.log("Update hodin ted!");
     if((((ted - casovac) / 1000) > 10)){
@@ -425,7 +437,8 @@ function updateTextFields(mode){
         let i = 0;
         if(data.stops.length < 8){
             console.log("máme míň jak 8 zastávek");
-            document.getElementById("viaStops").style.backgroundColor = "transparent";
+            document.getElementById("viaStops").classList.add("hidden");
+            npViaStops = false;
             document.getElementById("viaStopDots").style.borderColor = "transparent";
             for (const element of dots) {
                 console.log("Index loopu: " + i + "// Objekt zastávky: " + data.stops[i]);
@@ -461,7 +474,8 @@ function updateTextFields(mode){
         }
         else{
             console.log("máme víc jak 8 zastávek");
-            document.getElementById("viaStops").style.backgroundColor = "";
+            document.getElementById("viaStops").classList.remove("hidden");
+            npViaStops = true;
             document.getElementById("viaStopDots").style.borderColor = "";
             document.documentElement.style.setProperty("--cara-bottom-offset", "120px");
             for (const element of dots) {
@@ -624,6 +638,9 @@ let npRouteData = {};
 let npPrevData = {};
 let npAnimRunning = false;
 let npPrevVehInStop = false;
+let npViaStops = false;
+let npViaStopArray = [];
+let npViaStopIndex = 0;
 
 function necitelnaPraha(npData){
     //console.log(JSON.stringify(npData));
@@ -631,6 +648,19 @@ function necitelnaPraha(npData){
     if(inputType == 0 && npData.dataType != undefined){
         if(npData.dataType == "routeData"){
             npData = JSON.parse(JSON.stringify(npData.data));
+            if(npData.stops.length > 7){
+                npViaStopArray = npData.stops.slice(7);
+                console.warn("Zastávek pro viastops: " + npViaStopArray.length);
+                let temp = [];
+                for (let i = 0; i < npViaStopArray.length; i++) {
+                    const element = npViaStopArray[i];
+                    if(i % 3 == 0){
+                        temp.push(element);
+                    }
+                }
+                npViaStopArray = temp;
+                console.log(npViaStopArray);
+            }
             npRouteData = JSON.parse(JSON.stringify(npData));
         }
         else if(npData.dataType == "liveData"){
@@ -641,16 +671,34 @@ function necitelnaPraha(npData){
                  dest: npRouteData.dest,
                 stops: npRouteData.stops.slice(npData.data.stopIndex)
             };
+            if(npData.stops.length > 7 && !vehInStop){
+                npViaStopArray = npViaStopArray.slice(wsStopIndex%3 > 0 ? 0 : 1);
+                console.log(npViaStopArray);
+            }
             //console.log(npData);
         }
     }
     let inv = !vehInStop;
-    document.documentElement.style.setProperty("--laststop-koule", npData.stops.length == 1 ? "transparent" : "var(--cerna-text)");
-    document.documentElement.style.setProperty("--cara-bottom-offset", npData.stops.length == 1 ? "920px" : "80px");
+    console.log("Máme přesně " + npData.stops.length + " zastávek. (pre koule def)");
+    document.documentElement.style.setProperty("--laststop-koule", npData.stops.length <= 1 ? "transparent" : "var(--cerna-text)");
+    document.documentElement.style.setProperty("--cara-bottom-offset", npData.stops.length <= 1 ? "920px" : "80px");
     document.getElementById("lastStopStrizka").className = npData.stops.length == 1 ? "move" : "";
+        
+    document.getElementsByClassName("linkabg")[0].style.width = inv ? "360px" : "var(--fullsirka)";
+    document.getElementById("nextStopMinutes").style.color = !inv ? "transparent" : "";
+    document.documentElement.style.setProperty("--nextstop-text", (inv ? "white" : "rgba(29, 29, 29)"));
+    document.documentElement.style.setProperty("--nextstop-koule", (inv ? "rgba(53, 53, 53)" :"white" ));
+    document.getElementById("destination").className = npData.stops.length == 1 ? "move" : "";
+    if(npData.stops.length == 1){
+        document.getElementById("lastStopDot").className = "move";
+    }
+    else{
+        document.getElementById("lastStopDot").className = "";
+        document.getElementById("lastStopDot").style = "";
+    }
 
     if(JSON.stringify(npPrevData) == "{}" ){//při čistém definování
-        console.log("First definigtion");
+        console.log("First definition");
         npAnimUpdate(undefined, npData);
         npPrevData = JSON.parse(JSON.stringify(npData));
         return;
@@ -678,20 +726,12 @@ function necitelnaPraha(npData){
     //když vozidlo bylo v zastávce (čili poslední stav proměnné vehInStop byl true, jenže na konci této funkce je negace)
     if(!inv && vehInStop != npPrevVehInStop){
         updateData(npData);
-        document.getElementsByClassName("linkabg")[0].style.width = inv ? "360px" : "var(--fullsirka)";
-        document.getElementById("nextStopMinutes").style.color = !inv ? "transparent" : "";
-        document.documentElement.style.setProperty("--nextstop-text", (inv ? "white" : "rgba(29, 29, 29)"));
-        document.documentElement.style.setProperty("--nextstop-koule", (inv ? "rgba(53, 53, 53)" :"white" ));
         if(data.stops.length > 1){
             document.getElementById("lastStopDot").className = "";
             document.getElementById("lastStopDot").style = "";
         }
     }
     else if(inv && vehInStop != npPrevVehInStop){
-        document.getElementsByClassName("linkabg")[0].style.width = inv ? "360px" : "var(--fullsirka)";
-        document.documentElement.style.setProperty("--nextstop-text", (inv ? "white" : "rgba(29, 29, 29)"));
-        document.documentElement.style.setProperty("--nextstop-koule", (inv ? "rgba(53, 53, 53)" :"white" ));
-        document.getElementById("destination").className = npData.stops.length == 1 ? "move" : "";
         let upStops = document.querySelectorAll('[data-poletyp="upStop"]');
         let dots = document.querySelectorAll('[data-poletyp="upStopDot"]')
         let minEl = document.getElementsByClassName("stopMin");
@@ -704,14 +744,7 @@ function necitelnaPraha(npData){
         for (const element of minEl) {
             element.style = "color: transparent;";
         }
-        if(data.stops.length == 1){
-            document.getElementById("lastStopDot").className = "move";
-        }
-        else{
-            document.getElementById("lastStopDot").className = "";
-            document.getElementById("lastStopDot").style = "";
 
-        }
         console.log("Před timeoutem");
 
         npAnimRunning = true;
@@ -770,11 +803,11 @@ function npAnimUpdate(mode,npData){
             element.style = "color: transparent;";
         }        
         if(npData.stops.length < 8){
-            document.getElementById("viaStops").style.backgroundColor = "transparent";
+            document.getElementById("viaStops").classList.add("hidden");
             document.getElementById("viaStopDots").style.borderColor = "transparent";
         }
         else{
-            document.getElementById("viaStops").style.backgroundColor = "";
+            document.getElementById("viaStops").classList.add("hidden");
             document.getElementById("viaStopDots").style.borderColor = "";
         }
     }
@@ -799,4 +832,18 @@ function npAnimUpdate(mode,npData){
             }
         }
     }, animDuration)
+}
+
+function npViaStopsAnim(){
+    //funkce se spouští každé 3s
+    document.getElementById("viaStop1").children[0].innerHTML = npViaStopArray[npViaStopIndex].name;
+    document.getElementById("viaStop2").children[0].innerHTML = npViaStopArray[npViaStopArray.length-2 < npViaStopIndex ? 0 : npViaStopIndex+1].name;
+    document.getElementById("viaStops").classList.add("move");
+    console.log(npViaStopArray.length + " " + `${npViaStopIndex}`);
+    npViaStopIndex = (npViaStopArray.length-3 < npViaStopIndex) ? 0 : npViaStopIndex + 1; 
+    setTimeout(() => {
+        document.getElementById("viaStop1").children[0].innerHTML = npViaStopArray[npViaStopIndex].name;
+        document.getElementById("viaStop2").children[0].innerHTML = npViaStopArray[npViaStopIndex+1].name;
+        document.getElementById("viaStops").classList.remove("move");
+    }, 500);
 }
